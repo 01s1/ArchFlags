@@ -1,0 +1,2254 @@
+{
+  "providers": [
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ad.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ae.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/af.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ag.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ai.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/al.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/am.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ao.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/aq.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ar.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/as.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/at.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/au.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/aw.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ax.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/az.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ba.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/bb.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/bd.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/be.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/bf.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/bg.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/bh.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/bi.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/bj.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/bl.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/bm.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/bn.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/bo.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/bq.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/br.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/bs.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/bt.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/bv.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/bw.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/by.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/bz.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ca.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/cc.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/cd.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/cf.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/cg.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ch.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ci.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ck.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/cl.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/cm.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/cn.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/co.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/cr.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/cu.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/cv.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/cw.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/cx.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/cy.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/cz.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/de.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/dg.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/dj.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/dk.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/dm.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/do.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/dz.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ec.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ee.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/eg.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/eh.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/er.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/es.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/et.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/fi.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/fj.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/fk.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/fm.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/fo.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/fr.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ga.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/gb.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/gd.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ge.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/gf.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/gg.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/gh.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/gi.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/gl.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/gm.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/gn.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/gp.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/gq.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/gr.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/gs.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/gt.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/gu.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/gw.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/gy.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/hk.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/hm.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/hn.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/hr.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ht.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/hu.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/id.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ie.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/il.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/im.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/in.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/io.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/iq.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ir.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/is.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/it.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/je.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/jm.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/jo.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/jp.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ke.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/kg.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/kh.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ki.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/km.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/kn.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/kp.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/kr.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/kw.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ky.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/kz.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/la.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/lb.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/lc.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/li.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/lk.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/lr.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ls.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/lt.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/lu.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/lv.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ly.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ma.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/mc.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/md.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/me.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/mf.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/mg.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/mh.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/mk.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ml.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/mm.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/mn.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/mo.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/mp.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/mq.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/mr.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ms.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/mt.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/mu.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/mv.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/mw.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/mx.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/my.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/mz.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/na.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/nc.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ne.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/nf.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ng.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ni.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/nl.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/no.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/np.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/nr.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/nu.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/nz.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/om.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/pa.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/pe.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/pf.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/pg.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ph.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/pk.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/pl.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/pm.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/pn.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/pr.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ps.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/pt.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/pw.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/py.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/qa.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/re.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ro.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/rs.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ru.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/rw.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/sa.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/sb.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/sc.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/sd.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/se.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/sg.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/sh.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/si.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/sj.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/sk.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/sl.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/sm.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/sn.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/so.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/sr.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ss.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/st.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/sv.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/sx.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/sy.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/sz.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/tc.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/td.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/tf.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/tg.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/th.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/tj.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/tk.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/tl.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/tm.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/tn.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/to.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/tr.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/tt.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/tv.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/tw.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/tz.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ua.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ug.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/um.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/us.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/uy.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/uz.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/va.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/vc.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ve.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/vg.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/vi.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/vn.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/vu.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/wf.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ws.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/ye.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/yt.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/za.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/zm.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "archflags:font/flags/zw.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        ""
+      ]
+    }
+  ]
+}

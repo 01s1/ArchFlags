@@ -1,0 +1,12 @@
+{
+  "width": 16,
+  "height": 11,
+  "startCodepoint": "E200",
+  "java": {
+    "fontHeight": 8,
+    "fontAscent": 7
+  },
+  "bedrock": {
+    "cellSize": 16
+  }
+}
