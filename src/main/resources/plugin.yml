@@ -6,22 +6,34 @@ author: ARCH
 description: Detects a player's country from their Velocity-forwarded IP and exposes PlaceholderAPI placeholders for an above-head nametag flag. Never touches TAB, chat, or the player list directly.
 website: https://github.com/ARCH
 
-softdepend: [PlaceholderAPI, LuckPerms]
+softdepend: [PlaceholderAPI, LuckPerms, TAB, floodgate]
 
 commands:
-  flags:
-    description: Toggle your own country flag visibility.
-    usage: /flags [on|off|toggle]
-    aliases: [flag]
+  flag:
+    description: Toggle your own country flag visibility (on/off/toggle/status).
+    usage: /flag [on|off|toggle|status]
+    aliases: [flags]
   archflags:
     description: ArchFlags admin commands.
     usage: /archflags <reload|lookup|status>
-    permission: archflags.admin
 
 permissions:
-  archflags.use:
-    description: Allows use of /flags to control your own flag visibility.
+  archflags.command:
+    description: Allows use of /flag to control your own flag visibility.
     default: true
-  archflags.admin:
-    description: Allows use of /archflags admin subcommands.
+  archflags.admin.reload:
+    description: Allows /archflags reload.
     default: op
+  archflags.admin.lookup:
+    description: Allows /archflags lookup <player>.
+    default: op
+  archflags.admin.status:
+    description: Allows /archflags status.
+    default: op
+  archflags.admin:
+    description: Grants all ArchFlags admin permissions.
+    default: op
+    children:
+      archflags.admin.reload: true
+      archflags.admin.lookup: true
+      archflags.admin.status: true

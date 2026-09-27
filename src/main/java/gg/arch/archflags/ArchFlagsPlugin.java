@@ -8,8 +8,11 @@ import gg.arch.archflags.config.ArchFlagsConfig;
 import gg.arch.archflags.data.FlagVisibilityStore;
 import gg.arch.archflags.geo.GeoIpService;
 import gg.arch.archflags.glyph.GlyphMapping;
+import gg.arch.archflags.integration.FloodgateIntegration;
+import gg.arch.archflags.integration.TabIntegration;
 import gg.arch.archflags.listeners.PlayerConnectionListener;
 import gg.arch.archflags.placeholder.ArchFlagsExpansion;
+import gg.arch.archflags.resourcepack.JavaResourcePackService;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,6 +24,9 @@ public final class ArchFlagsPlugin extends JavaPlugin {
     private FlagVisibilityStore visibilityStore;
     private GlyphMapping glyphMapping;
     private ArchFlagsExpansion expansion;
+    private TabIntegration tabIntegration;
+    private FloodgateIntegration floodgateIntegration;
+    private JavaResourcePackService resourcePackService;
 
     @Override
     public void onEnable() {
@@ -31,6 +37,9 @@ public final class ArchFlagsPlugin extends JavaPlugin {
         this.geoIpService = new GeoIpService(this);
         this.visibilityStore = new FlagVisibilityStore(this);
         this.glyphMapping = new GlyphMapping();
+        this.tabIntegration = new TabIntegration(this);
+        this.floodgateIntegration = new FloodgateIntegration(this);
+        this.resourcePackService = new JavaResourcePackService(this);
 
         glyphMapping.load(this, config.glyphMappingFile());
         geoIpService.loadDatabaseAsync();
@@ -38,12 +47,15 @@ public final class ArchFlagsPlugin extends JavaPlugin {
         if (!visibilityStore.isLuckPermsAvailable()) {
             getLogger().warning("LuckPerms not found -- flag visibility will default to per-server memory only (not persisted network-wide) until LuckPerms is installed.");
         }
+        tabIntegration.hook();
+        floodgateIntegration.hook();
+        resourcePackService.reload();
 
         Bukkit.getPluginManager().registerEvents(new PlayerConnectionListener(this), this);
 
-        var flagsCommand = getCommand("flags");
-        if (flagsCommand != null) {
-            flagsCommand.setExecutor(new FlagsCommand(this));
+        var flagCommand = getCommand("flag");
+        if (flagCommand != null) {
+            flagCommand.setExecutor(new FlagsCommand(this));
         }
         var adminCommand = getCommand("archflags");
         if (adminCommand != null) {
@@ -65,6 +77,9 @@ public final class ArchFlagsPlugin extends JavaPlugin {
             expansion = null;
         }
         Bukkit.getServicesManager().unregisterAll(this);
+        if (resourcePackService != null) {
+            resourcePackService.stop();
+        }
         if (geoIpService != null) {
             geoIpService.shutdown();
         }
@@ -80,13 +95,16 @@ public final class ArchFlagsPlugin extends JavaPlugin {
         getLogger().info("Registered PlaceholderAPI expansion 'archflags'.");
     }
 
-    /** Reloads config.yml and the glyph mapping, and re-attempts to open the GeoIP database. */
+    /** Reloads config.yml, the glyph mapping, TAB/Floodgate hooks, and the Java resource pack. */
     public void reload() {
         reloadConfig();
         this.config = new ArchFlagsConfig(this, getConfig());
         glyphMapping.load(this, config.glyphMappingFile());
         geoIpService.loadDatabaseAsync();
         visibilityStore.hookLuckPerms();
+        tabIntegration.hook();
+        floodgateIntegration.hook();
+        resourcePackService.reload();
     }
 
     public ArchFlagsConfig archConfig() {
@@ -103,5 +121,17 @@ public final class ArchFlagsPlugin extends JavaPlugin {
 
     public GlyphMapping glyphMapping() {
         return glyphMapping;
+    }
+
+    public TabIntegration tabIntegration() {
+        return tabIntegration;
+    }
+
+    public FloodgateIntegration floodgateIntegration() {
+        return floodgateIntegration;
+    }
+
+    public JavaResourcePackService resourcePackService() {
+        return resourcePackService;
     }
 }

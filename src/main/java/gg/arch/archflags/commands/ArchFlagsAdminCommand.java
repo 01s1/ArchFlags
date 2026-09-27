@@ -20,10 +20,6 @@ public final class ArchFlagsAdminCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!sender.hasPermission("archflags.admin")) {
-            sender.sendMessage(plugin.archConfig().prefixedMessage("no-permission"));
-            return true;
-        }
         if (args.length == 0) {
             sender.sendMessage("Usage: /archflags <reload|lookup <player>|status>");
             return true;
@@ -31,12 +27,27 @@ public final class ArchFlagsAdminCommand implements CommandExecutor {
 
         switch (args[0].toLowerCase(java.util.Locale.ROOT)) {
             case "reload" -> {
+                if (!requirePermission(sender, "archflags.admin.reload")) return true;
                 plugin.reload();
                 sender.sendMessage(plugin.archConfig().prefixedMessage("reload-success"));
             }
-            case "lookup" -> lookup(sender, args);
-            case "status" -> status(sender);
+            case "lookup" -> {
+                if (!requirePermission(sender, "archflags.admin.lookup")) return true;
+                lookup(sender, args);
+            }
+            case "status" -> {
+                if (!requirePermission(sender, "archflags.admin.status")) return true;
+                status(sender);
+            }
             default -> sender.sendMessage("Usage: /archflags <reload|lookup <player>|status>");
+        }
+        return true;
+    }
+
+    private boolean requirePermission(CommandSender sender, String permission) {
+        if (!sender.hasPermission(permission)) {
+            sender.sendMessage(plugin.archConfig().prefixedMessage("no-permission"));
+            return false;
         }
         return true;
     }
@@ -77,6 +88,9 @@ public final class ArchFlagsAdminCommand implements CommandExecutor {
         sender.sendMessage("Display mode: " + cfg.displayMode() + " (fallback " + cfg.fallbackMode() + ")");
         sender.sendMessage("LuckPerms hooked: " + plugin.visibilityStore().isLuckPermsAvailable());
         sender.sendMessage("PlaceholderAPI hooked: " + (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null));
+        sender.sendMessage("TAB hooked (immediate refresh): " + plugin.tabIntegration().isAvailable());
+        sender.sendMessage("Floodgate hooked (Bedrock detection): " + plugin.floodgateIntegration().isAvailable());
+        sender.sendMessage("Java resource pack: " + (cfg.javaPackEnabled() ? "enabled" : "disabled"));
         sender.sendMessage("Debug: " + cfg.debug());
     }
 }

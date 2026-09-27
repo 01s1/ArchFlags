@@ -33,6 +33,15 @@ public final class ArchFlagsConfig {
     private final boolean cacheEnabled;
     private final int retainAfterQuitMinutes;
 
+    private final boolean javaPackEnabled;
+    private final String javaPackUrl;
+    private final boolean javaPackRequired;
+    private final String javaPackPrompt;
+    private final boolean javaPackSelfHostEnabled;
+    private final String javaPackSelfHostBindAddress;
+    private final int javaPackSelfHostPort;
+    private final String javaPackPublicAddress;
+
     private final java.util.Map<String, String> messages = new java.util.HashMap<>();
 
     public ArchFlagsConfig(ArchFlagsPlugin plugin, FileConfiguration cfg) {
@@ -66,6 +75,16 @@ public final class ArchFlagsConfig {
 
         this.cacheEnabled = cfg.getBoolean("cache.enabled", true);
         this.retainAfterQuitMinutes = Math.max(1, cfg.getInt("cache.retain-after-quit-minutes", 30));
+
+        this.javaPackEnabled = cfg.getBoolean("resourcepack.java.enabled", true);
+        this.javaPackUrl = cfg.getString("resourcepack.java.url", "");
+        this.javaPackRequired = cfg.getBoolean("resourcepack.java.required", false);
+        this.javaPackPrompt = ChatColor.translateAlternateColorCodes('&',
+                cfg.getString("resourcepack.java.prompt", "&bArchFlags needs its small flag pack alongside your other resource packs."));
+        this.javaPackSelfHostEnabled = cfg.getBoolean("resourcepack.java.self-host.enabled", true);
+        this.javaPackSelfHostBindAddress = cfg.getString("resourcepack.java.self-host.bind-address", "0.0.0.0");
+        this.javaPackSelfHostPort = cfg.getInt("resourcepack.java.self-host.port", 25566);
+        this.javaPackPublicAddress = cfg.getString("resourcepack.java.self-host.public-address", "");
 
         if (cfg.isConfigurationSection("messages")) {
             for (String key : cfg.getConfigurationSection("messages").getKeys(false)) {
@@ -136,6 +155,38 @@ public final class ArchFlagsConfig {
 
     public int retainAfterQuitMinutes() {
         return retainAfterQuitMinutes;
+    }
+
+    public boolean javaPackEnabled() {
+        return javaPackEnabled;
+    }
+
+    public String javaPackUrl() {
+        return javaPackUrl;
+    }
+
+    public boolean javaPackRequired() {
+        return javaPackRequired;
+    }
+
+    public String javaPackPrompt() {
+        return javaPackPrompt;
+    }
+
+    public boolean javaPackSelfHostEnabled() {
+        return javaPackSelfHostEnabled;
+    }
+
+    public String javaPackSelfHostBindAddress() {
+        return javaPackSelfHostBindAddress;
+    }
+
+    public int javaPackSelfHostPort() {
+        return javaPackSelfHostPort;
+    }
+
+    public String javaPackPublicAddress() {
+        return javaPackPublicAddress;
     }
 
     public String message(String key) {

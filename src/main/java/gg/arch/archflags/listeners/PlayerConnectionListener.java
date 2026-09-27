@@ -5,12 +5,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
  * Kicks off country resolution as early as possible (pre-login, already off the main thread) so
- * it's usually ready by the time the player's nametag first renders, and schedules cache eviction
- * on quit. Never touches TAB, chat, the player list, or scoreboards.
+ * it's usually ready by the time the player's nametag first renders, sends ArchFlags' own
+ * independent Java resource pack on join, and schedules cache eviction on quit. Never touches
+ * TAB, chat, the player list, or scoreboards.
  */
 public final class PlayerConnectionListener implements Listener {
 
@@ -28,6 +30,12 @@ public final class PlayerConnectionListener implements Listener {
         // Fire-and-forget: resolution completes on its own executor and populates the cache;
         // we don't block login waiting for it.
         plugin.geoIpService().resolve(event.getUniqueId(), event.getAddress());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onJoin(PlayerJoinEvent event) {
+        // Additive (replace=false) -- never removes NxRanks' own pack, see JavaResourcePackService.
+        plugin.resourcePackService().sendTo(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

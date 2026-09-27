@@ -32,11 +32,44 @@ nametag:
 # (or any MiniMessage-aware renderer) picks the right custom font for the
 # glyph automatically. Only used in CUSTOM_GLYPH mode. See README.md ->
 # "TAB integration" for how to reference this in TAB's nametag config.
+#
+# IMPORTANT: E200-E2F9 is ArchFlags' own, separate private-use-area range.
+# NxRanks uses E9xx for its own glyphs on this network -- never change
+# start-codepoint to something inside E900-E9FF, and never merge these
+# generated assets into NxRanks' resource pack (see resourcepack: below and
+# README.md). If you do change this, re-run tools/asset-generator and update
+# nothing else here manually -- the mapping file is regenerated for you.
 glyphs:
   start-codepoint: "E200"
   mapping-file: "glyph-mapping.yml"
   wrap-minimessage: true
   font-key: "archflags:flags"
+
+# ArchFlags' own, fully independent Java resource pack (never merged into NxRanks'). Sent
+# additively alongside whatever pack(s) NxRanks already sends -- it is never replaced by an
+# NxRanks update, and updating NxRanks never removes it. Only used in CUSTOM_GLYPH mode; leave
+# resourcepack.java.enabled: false if you only use UNICODE/COUNTRY_CODE modes.
+#
+# The Bedrock pack is NOT sent by this plugin -- Geyser reads Bedrock packs from its own
+# Geyser-Velocity/packs/ folder. Copy output/ArchFlags-Bedrock.zip there by hand; see README.md.
+resourcepack:
+  java:
+    enabled: true
+    # Set this to an externally-hosted URL (your own web server/CDN) for a production network.
+    # Leave blank to let ArchFlags self-host the pack instead (see self-host: below).
+    url: ""
+    # Vanilla clients disconnect themselves if a *required* pack is rejected/fails -- leave this
+    # false unless you're sure every player can actually reach the pack URL.
+    required: false
+    prompt: "&bArchFlags needs its small flag pack alongside your other resource packs."
+    self-host:
+      enabled: true
+      bind-address: "0.0.0.0"
+      # If HUB/SMP/SURVIVAL run on the same machine, each server needs its OWN port here.
+      port: 25566
+      # REQUIRED when self-host is enabled and url above is blank: the host/IP players'
+      # clients can actually reach (your domain or public IP) -- not 0.0.0.0 or 127.0.0.1.
+      public-address: ""
 
 luckperms:
   # LuckPerms meta node used to persist flag visibility network-wide.

@@ -1,0 +1,29 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "ArchFlags Flags",
+    "description": "ArchFlags country flags (nametag glyphs only) - independent of NxRanks",
+    "uuid": "903294ae-d8b5-4e2d-bd24-43b845255973",
+    "version": [
+      1,
+      0,
+      1
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      0
+    ]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "d7ca77eb-00c1-42bf-bad2-7de228625817",
+      "version": [
+        1,
+        0,
+        1
+      ]
+    }
+  ]
+}

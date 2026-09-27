@@ -1,7 +1,8 @@
 # ArchFlags asset generator
 
-Generates every ISO 3166-1 alpha-2 country's nametag flag glyph (Java + Bedrock) and
-`glyph-mapping.yml` automatically -- nothing here is hand-typed per country.
+Generates every ISO 3166-1 alpha-2 country's nametag flag glyph as two fully **independent**
+resource packs (Java + Bedrock -- neither is ever merged into NxRanks') plus `glyph-mapping.yml`,
+automatically -- nothing here is hand-typed per country.
 
 ## Source dataset
 
@@ -40,26 +41,38 @@ npm install
 npm run generate
 ```
 
-Reads `generator.config.json` (flag pixel dimensions, start codepoint, Bedrock
-glyph cell size) and `flags-source/*.svg`, and writes:
+Reads `generator.config.json` (flag pixel dimensions, start codepoint, Java `pack_format`,
+Bedrock glyph cell size + pack UUIDs/version) and `flags-source/*.svg`, and writes:
 
-- `../../output/java/assets/archflags/textures/font/flags/<code>.png` -- one small
-  PNG per country (default 16x11px)
-- `../../output/java/assets/archflags/font/flags.json` -- a Java bitmap-font
-  `providers` array, one entry per country, each mapped to its own private-use-area
-  codepoint
-- `../../output/bedrock/textures/font/glyph_EN.png` -- one or more 16x16-grid
-  Bedrock glyph sheets (see "Bedrock limitations" below)
+- `../../output/java/` -- the Java pack's source tree (`pack.mcmeta` +
+  `assets/archflags/font/flags.json` + `assets/archflags/textures/font/flags/<code>.png`, one
+  small PNG per country, default 16x11px, one bitmap-font provider per country each mapped to
+  its own private-use-area codepoint)
+- `../../output/ArchFlags-Java.zip` -- the zipped Java pack, also copied to
+  `../../src/main/resources/archflags-java-pack.zip` so it's embedded in the plugin jar (the
+  plugin sends/serves this itself -- see the main README's "Resource packs" section)
+- `../../output/bedrock/` -- the Bedrock pack's source tree (`manifest.json` +
+  `textures/font/glyph_EN.png` sheet(s), see "Bedrock limitations" below)
+- `../../output/ArchFlags-Bedrock.zip` -- the zipped Bedrock pack. **Not** embedded in the
+  plugin -- copy this by hand to `Geyser-Velocity/packs/ArchFlags-Bedrock.zip` after every
+  regeneration (see the main README)
 - `../../output/glyph-mapping.yml` -- `country code -> {codepoint, name}`, also
   copied to `../../src/main/resources/glyph-mapping.yml` so the plugin ships a
   working default
 - `../../output/GENERATION_REPORT.md` -- a human-readable summary of the run
 
-Re-run after editing `generator.config.json` (e.g. to change
-`startCodepoint` to avoid colliding with NxRanks/NxEmoji's own private-use-area
-ranges) -- and update `glyphs.start-codepoint` in the plugin's `config.yml` to
-match, since the plugin reads the codepoint straight out of the mapping file
-rather than assuming a fixed range.
+Re-run after editing `generator.config.json` (e.g. to change `startCodepoint` -- **ArchFlags'
+own range is `E200`-`E2F9`; NxRanks uses `E9xx` on this network, so never move into `E900`-`E9FF`,
+and check any other plugin's private-use-area usage too**) -- and update `glyphs.start-codepoint`
+in the plugin's `config.yml` to match, since the plugin reads the codepoint straight out of the
+mapping file rather than assuming a fixed range.
+
+Each run also checks whether the Bedrock pack's actual pixel content changed since the last run
+(tracked via `bedrock.lastContentHash` in `generator.config.json`) and, if so, automatically
+bumps `bedrock.version`'s patch number -- written into both the manifest and back into
+`generator.config.json` -- so Geyser/Bedrock clients never keep a stale cached copy. The
+header/module UUIDs in `generator.config.json` are generated once and must never change, or
+Geyser will treat the next zip as a brand new pack instead of an update to this one.
 
 ## Bedrock limitations
 
@@ -71,8 +84,9 @@ high byte of the codepoint (e.g. codepoints `E200`-`E2FF` live in
 dimensions as the Java texture so the two platforms look as close as
 reasonably possible. This is a widely used but **unofficial** convention (no
 official Mojang Bedrock documentation covers it) -- test on your actual
-Bedrock/Geyser client after merging. If it doesn't render correctly on your
-Bedrock version, set `display.mode: COUNTRY_CODE` (or `fallback-mode:
+Bedrock/Geyser client after copying the pack into `Geyser-Velocity/packs/`. If
+it doesn't render correctly on your Bedrock version, set `display.mode:
+COUNTRY_CODE` (or `fallback-mode:
 COUNTRY_CODE`, which is the default) in `config.yml` rather than shipping a
 broken glyph.
 
