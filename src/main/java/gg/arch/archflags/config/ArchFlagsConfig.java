@@ -42,6 +42,9 @@ public final class ArchFlagsConfig {
     private final int javaPackSelfHostPort;
     private final String javaPackPublicAddress;
 
+    private final boolean bedrockPrefixFallbackEnabled;
+    private final String bedrockPrefixFallbackPrefix;
+
     private final java.util.Map<String, String> messages = new java.util.HashMap<>();
 
     public ArchFlagsConfig(ArchFlagsPlugin plugin, FileConfiguration cfg) {
@@ -85,6 +88,9 @@ public final class ArchFlagsConfig {
         this.javaPackSelfHostBindAddress = cfg.getString("resourcepack.java.self-host.bind-address", "0.0.0.0");
         this.javaPackSelfHostPort = cfg.getInt("resourcepack.java.self-host.port", 25566);
         this.javaPackPublicAddress = cfg.getString("resourcepack.java.self-host.public-address", "");
+
+        this.bedrockPrefixFallbackEnabled = cfg.getBoolean("bedrock-detection.username-prefix-fallback.enabled", false);
+        this.bedrockPrefixFallbackPrefix = cfg.getString("bedrock-detection.username-prefix-fallback.prefix", ".");
 
         if (cfg.isConfigurationSection("messages")) {
             for (String key : cfg.getConfigurationSection("messages").getKeys(false)) {
@@ -187,6 +193,14 @@ public final class ArchFlagsConfig {
 
     public String javaPackPublicAddress() {
         return javaPackPublicAddress;
+    }
+
+    public boolean bedrockPrefixFallbackEnabled() {
+        return bedrockPrefixFallbackEnabled;
+    }
+
+    public String bedrockPrefixFallbackPrefix() {
+        return bedrockPrefixFallbackPrefix;
     }
 
     public String message(String key) {

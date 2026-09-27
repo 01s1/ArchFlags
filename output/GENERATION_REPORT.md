@@ -1,6 +1,6 @@
 # ArchFlags asset generation report
 
-Generated: 2026-09-27T15:58:35.924Z
+Generated: 2026-09-27T17:14:43.466Z
 Countries: 250
 Flag glyph dimensions: 16x11px
 Codepoint range: U+E200 - U+E2F9 (separate from NxRanks' E9xx range)

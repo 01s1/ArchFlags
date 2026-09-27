@@ -33,6 +33,16 @@ import org.bukkit.entity.Player;
  */
 public final class JavaResourcePackService {
 
+    /** How the pack is currently being made reachable to players, for /archflags status. */
+    public enum DeliveryMode {
+        /** {@code resourcepack.java.url} is set -- recommended for a real multi-backend network. */
+        EXTERNAL,
+        /** ArchFlags' own built-in HTTP server is serving the pack. */
+        SELF_HOST,
+        /** Sending is off, or misconfigured badly enough that it couldn't start. */
+        DISABLED
+    }
+
     private static final UUID PACK_ID = UUID.nameUUIDFromBytes("archflags-java-resourcepack".getBytes(StandardCharsets.UTF_8));
     private static final String EMBEDDED_RESOURCE = "archflags-java-pack.zip";
     private static final String STAGED_FILE_NAME = "ArchFlags-Java.zip";
@@ -45,6 +55,7 @@ public final class JavaResourcePackService {
     private volatile String sha1Hex;
     private volatile URI packUri;
     private volatile boolean enabled;
+    private volatile DeliveryMode deliveryMode = DeliveryMode.DISABLED;
 
     public JavaResourcePackService(ArchFlagsPlugin plugin) {
         this.plugin = plugin;
@@ -54,10 +65,12 @@ public final class JavaResourcePackService {
     public void reload() {
         stop();
         enabled = false;
+        deliveryMode = DeliveryMode.DISABLED;
+        packUri = null;
 
         ArchFlagsConfig cfg = plugin.archConfig();
         if (!cfg.javaPackEnabled()) {
-            plugin.getLogger().info("Java resource pack sending disabled (resourcepack.java.enabled: false).");
+            plugin.getLogger().info("Java pack disabled: resourcepack.java.enabled is false.");
             return;
         }
 
@@ -66,31 +79,36 @@ public final class JavaResourcePackService {
         }
 
         String configuredUrl = cfg.javaPackUrl();
-        if (configuredUrl != null && !configuredUrl.isBlank()) {
+        String publicAddress = cfg.javaPackPublicAddress();
+        boolean hasUrl = configuredUrl != null && !configuredUrl.isBlank();
+        boolean hasSelfHostAddress = publicAddress != null && !publicAddress.isBlank();
+
+        if (hasUrl) {
             try {
                 packUri = new URI(configuredUrl);
             } catch (URISyntaxException ex) {
-                plugin.getLogger().warning("resourcepack.java.url is not a valid URL (" + ex.getMessage() + "); Java resource pack sending disabled.");
+                plugin.getLogger().warning("Java pack disabled: resourcepack.java.url is not a valid URL (" + ex.getMessage() + ").");
                 return;
             }
-        } else if (cfg.javaPackSelfHostEnabled()) {
-            String publicAddress = cfg.javaPackPublicAddress();
-            if (publicAddress == null || publicAddress.isBlank()) {
-                plugin.getLogger().warning("resourcepack.java.url is blank and resourcepack.java.self-host.public-address is not set -- "
-                        + "Java resource pack sending disabled. Set one of them (see README.md).");
-                return;
-            }
+            deliveryMode = DeliveryMode.EXTERNAL;
+        } else if (cfg.javaPackSelfHostEnabled() && hasSelfHostAddress) {
             if (!startSelfHostServer(cfg)) {
                 return;
             }
             packUri = URI.create("http://" + publicAddress + ":" + cfg.javaPackSelfHostPort() + HTTP_PATH);
+            deliveryMode = DeliveryMode.SELF_HOST;
+        } else if (!cfg.javaPackSelfHostEnabled()) {
+            plugin.getLogger().warning("Java pack disabled: no public URL configured. Set resourcepack.java.url, "
+                    + "or enable resourcepack.java.self-host and set self-host.public-address.");
+            return;
         } else {
-            plugin.getLogger().warning("No resourcepack.java.url configured and self-host is disabled -- Java resource pack sending disabled.");
+            plugin.getLogger().warning("Java pack disabled: no public URL configured. "
+                    + "resourcepack.java.self-host.public-address is required when resourcepack.java.url is blank (see README.md).");
             return;
         }
 
         enabled = true;
-        plugin.getLogger().info("Java resource pack ready at " + packUri + " (sha1 " + sha1Hex + ").");
+        plugin.getLogger().info("Java pack ready (" + deliveryMode + "): " + packUri + " (sha1 " + sha1Hex + ").");
     }
 
     private boolean stagePackFile() {
@@ -148,7 +166,7 @@ public final class JavaResourcePackService {
         if (!enabled || packUri == null || sha1Hex == null) {
             return;
         }
-        if (plugin.floodgateIntegration().isBedrockPlayer(player.getUniqueId())) {
+        if (plugin.floodgateIntegration().isBedrockPlayer(player.getName(), player.getUniqueId())) {
             return;
         }
         try {
@@ -173,6 +191,28 @@ public final class JavaResourcePackService {
             httpServer.stop(0);
             httpServer = null;
         }
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public DeliveryMode deliveryMode() {
+        return deliveryMode;
+    }
+
+    /** Nullable -- null unless {@link #isEnabled()}. Never a secret; it's the pack's public download URL. */
+    public URI packUri() {
+        return packUri;
+    }
+
+    /** Nullable -- the SHA-1 of the currently-staged pack file. Not a secret. */
+    public String sha1() {
+        return sha1Hex;
+    }
+
+    public int selfHostPort() {
+        return plugin.archConfig().javaPackSelfHostPort();
     }
 
     private static String sha1Hex(byte[] data) {

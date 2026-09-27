@@ -62,12 +62,11 @@ public final class TabIntegration {
 
             available = true;
             plugin.getLogger().info("Hooked TAB for immediate nametag refresh on flag changes.");
-        } catch (ReflectiveOperationException | LinkageError ex) {
+        } catch (Throwable ex) {
             available = false;
-            if (plugin.archConfig().debug()) {
-                plugin.getLogger().warning("TAB found but its API shape didn't match what ArchFlags expects ("
-                        + ex + "); nametags will still update on TAB's own refresh cycle.");
-            }
+            plugin.getLogger().warning("TAB found but its API shape didn't match what ArchFlags expects (" + ex
+                    + "); falling back to TAB's own normal placeholder refresh instead -- nametags will still "
+                    + "update, just not instantly. ArchFlags itself is unaffected.");
         }
     }
 
@@ -92,7 +91,9 @@ public final class TabIntegration {
                     updateMethod.invoke(placeholder, tabPlayer);
                 }
             }
-        } catch (ReflectiveOperationException ex) {
+        } catch (Throwable ex) {
+            // Never let a TAB-side failure break ArchFlags' own command handling -- worst case,
+            // the nametag just updates on TAB's own next refresh cycle instead of instantly.
             if (plugin.archConfig().debug()) {
                 plugin.getLogger().warning("TAB refresh call failed: " + ex);
             }

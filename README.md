@@ -20,7 +20,9 @@ them across all three via the network's shared LuckPerms.
 - Paper or Leaf, Minecraft 1.21.11, Java 21
 - Velocity 4.x with **modern** player-info forwarding
 - A local `GeoLite2-Country.mmdb` (MaxMind account required to download one -- see below)
-- Optional but recommended: PlaceholderAPI, LuckPerms, TAB, Floodgate (for Bedrock detection)
+- Optional but recommended: PlaceholderAPI, LuckPerms, TAB
+- For reliable Bedrock detection specifically: Floodgate installed on **this backend server**,
+  not just the proxy -- see "Bedrock detection" below, this is easy to get wrong
 
 ArchFlags does **not** create or require its own MySQL/MariaDB database.
 
@@ -46,16 +48,25 @@ ArchFlags does **not** create or require its own MySQL/MariaDB database.
    placeholder falls back to the configured "unknown" values -- it does not error or disable
    itself.
 4. Start the server once to generate `plugins/ArchFlags/config.yml` and
-   `glyph-mapping.yml`, then review `config.yml` (see below) -- in particular the
-   `resourcepack.java` section (self-hosting is on by default; set `public-address` or an
-   external `url`) if you're using `CUSTOM_GLYPH` mode.
+   `glyph-mapping.yml`, then review `config.yml` (see below) if you're using `CUSTOM_GLYPH`
+   mode -- in particular `resourcepack.java.url`. **Recommended:** host
+   `output/ArchFlags-Java.zip` on your own web server/CDN and put that one URL in
+   `resourcepack.java.url` on all three backends, so you're not running a self-hosted HTTP
+   server (and opening a port) on every server. Self-hosting is on by default as a fallback for
+   quick testing, but needs `resourcepack.java.self-host.public-address` set (and its own port
+   per backend if they share a machine) -- see "Resource packs" below.
 5. If you want the Bedrock flag glyphs too, copy `output/ArchFlags-Bedrock.zip` to
-   `Geyser-Velocity/packs/ArchFlags-Bedrock.zip` on the proxy -- see "Resource packs" below.
-   This step is required for `CUSTOM_GLYPH` mode; `UNICODE` and `COUNTRY_CODE` modes need no
-   resource pack at all, on either platform.
+   `Velocity/plugins/Geyser-Velocity/packs/ArchFlags-Bedrock.zip` on the proxy, next to
+   NxRanks' own Bedrock pack -- see "Resource packs" below. This step is required for
+   `CUSTOM_GLYPH` mode; `UNICODE` and `COUNTRY_CODE` modes need no resource pack at all, on
+   either platform.
 6. Configure TAB's above-head nametag to include `%archflags_nametag_suffix%` -- see
    "TAB integration" below.
-7. Repeat steps 2-6 identically on HUB, SMP, and SURVIVAL.
+7. If Floodgate is only installed on your Velocity proxy (the common setup), also install it on
+   each backend server -- see "Bedrock detection" below. Without this, ArchFlags cannot
+   reliably tell Java and Bedrock players apart, and Bedrock players may end up receiving the
+   Java pack, which they can't use.
+8. Repeat steps 2-7 identically on HUB, SMP, and SURVIVAL.
 
 ## Placeholders
 
@@ -121,15 +132,20 @@ the same file).
 to every Java player itself, right on join, using Minecraft's multi-resource-pack protocol
 (1.20.3+) with `replace: false` -- i.e. **added alongside** whatever pack(s) NxRanks already
 sends, never replacing them, and an NxRanks pack update likewise never removes ArchFlags' pack
-(they're two separate pack IDs). Bedrock/Floodgate players are automatically skipped (Bedrock
-clients don't use the Java pack format at all). Nothing to install by hand for Java players
+(they're two separate pack IDs). Bedrock players are skipped -- see "Bedrock detection" below for
+how that's actually determined on this network. Nothing to install by hand for Java players
 beyond making the pack reachable -- see `resourcepack.java` in `config.yml`:
-- **Self-hosted (default):** ArchFlags runs a tiny built-in HTTP server and serves the pack
-  itself. Set `resourcepack.java.self-host.public-address` to a host/IP players' clients can
-  actually reach (not `0.0.0.0`/`127.0.0.1`), and give each backend server its own
-  `self-host.port` if HUB/SMP/SURVIVAL share a machine.
-- **Externally hosted (recommended for production):** host `output/ArchFlags-Java.zip` on your
-  own web server/CDN and set `resourcepack.java.url` to it; this disables self-hosting.
+- **Externally hosted (recommended):** host `output/ArchFlags-Java.zip` on your own web
+  server/CDN and set `resourcepack.java.url` to it on all three backends -- one URL, no ports to
+  open on the game servers themselves.
+- **Self-hosted (default fallback, fine for testing):** ArchFlags runs a tiny built-in HTTP
+  server and serves the pack itself. Set `resourcepack.java.self-host.public-address` to a
+  host/IP players' clients can actually reach (not `0.0.0.0`/`127.0.0.1`), and give each backend
+  server its own `self-host.port` if HUB/SMP/SURVIVAL share a machine. Ignored when
+  `resourcepack.java.url` is set.
+
+If neither is configured, ArchFlags does not silently do nothing -- it logs
+`Java pack disabled: no public URL configured.` on startup and in `/archflags status`.
 
 **Bedrock** -- `output/ArchFlags-Bedrock.zip`: ArchFlags does **not** send this itself --
 Geyser/Bedrock resource packs are delivered by Geyser reading its own pack folder on the
@@ -156,6 +172,55 @@ how the flag is *drawn*, never which country is shown or on which side of the na
 
 See [`tools/asset-generator/README.md`](tools/asset-generator/README.md) for the flag source
 dataset's license/attribution and generator usage/limitations in full.
+
+## Bedrock detection (read this if Floodgate is only on your proxy)
+
+ArchFlags needs to know whether a connecting player is Java or Bedrock for exactly one reason:
+so it doesn't send the Java resource pack to a Bedrock client, which can't use it. **Country
+resolution, visibility, and everything else about ArchFlags is completely unaffected either
+way** -- this section only matters for that one decision.
+
+On a typical Velocity network, **Geyser and Floodgate run on the proxy, not on the backend Paper
+servers** -- and that's exactly the setup this network uses. Floodgate's own official, reliable
+detection API (`FloodgateApi.isFloodgatePlayer(uuid)`) only works on a server where the
+Floodgate *plugin* is loaded. If it's only on Velocity, a backend server like HUB, SMP, or
+SURVIVAL has no way to call that API at all -- it isn't a bug in ArchFlags, there's just nothing
+there to call.
+
+**The reliable fix (recommended):** install Floodgate on each backend server too, using the
+*same* `key.pem` as the proxy's Floodgate installation:
+
+1. On the proxy, in Floodgate's config, set `send-floodgate-data: true`.
+2. Copy `plugins/floodgate/key.pem` from the **proxy** to `plugins/floodgate/key.pem` on **each**
+   of HUB, SMP, and SURVIVAL. (Never share this file outside your own servers -- see
+   [Floodgate's setup guide](https://geysermc.org/wiki/floodgate/setup/proxy-servers/).)
+3. Restart each backend. ArchFlags will log `Hooked Floodgate on this backend for reliable
+   Bedrock detection.` on startup, and `/archflags status` will show `Bedrock detection:
+   Floodgate API (reliable)`.
+
+Backend Floodgate here is lightweight -- it doesn't run Geyser or bridge any connections itself,
+it just decodes the data the proxy's Floodgate already forwards.
+
+**If you don't want to install backend Floodgate:** ArchFlags will say so explicitly in its
+startup logs rather than silently guessing wrong, and offers an optional, clearly best-effort
+fallback: Floodgate already rewrites a Bedrock player's visible Java username on the proxy
+(adding a prefix -- `.` by default) before forwarding them anywhere, so that prefix is often
+still visible to a backend even without Floodgate installed there. Enable it with:
+
+```yaml
+bedrock-detection:
+  username-prefix-fallback:
+    enabled: true
+    prefix: "."   # must match Floodgate's own "username-prefix" setting on the proxy
+```
+
+This is **not** an officially documented or guaranteed Floodgate behavior -- it breaks if that
+prefix is set to empty on the proxy, and it's off by default. `/archflags status` reports
+`Bedrock detection: username-prefix heuristic (best-effort, ...)` when it's the only thing
+active, so you always know which mode you're actually running in. If neither backend Floodgate
+nor the fallback is available, every player is treated as Java (also stated plainly in the logs
+and in `/archflags status`), which means Bedrock players may incorrectly receive the Java pack
+until one of the two is set up.
 
 ## Display modes
 
@@ -186,9 +251,20 @@ showing a broken-square tofu glyph.
 `archflags.admin` is a parent permission that grants all three `archflags.admin.*` nodes.
 Default visibility for every player is **ON**.
 
+Both commands support tab completion: `/flag <TAB>` suggests `on`/`off`/`toggle`/`status`
+(filtered by whatever's already typed, e.g. `/flag o<TAB>` → `on`, `off`), and `/flags <TAB>`
+behaves identically since it's just the alias. `/archflags <TAB>` only suggests the subcommands
+the sender actually has permission for, and `/archflags lookup <TAB>` suggests online player
+names. Any unrecognized `/flag` argument (e.g. `/flag banana`) is rejected with the `flag-usage`
+message -- it does **not** silently fall back to showing status.
+
 `/archflags lookup` never prints a raw IP address -- only the resolved country name/code and
 visibility. Offline players who haven't connected recently show as "Unknown" (nothing is
 resolvable without a live connection, and ArchFlags never stores a raw IP to look up later).
+
+`/archflags status` reports every integration's actual state at a glance -- GeoIP/mapping
+loaded, display mode, LuckPerms/PlaceholderAPI/TAB hooks, Bedrock detection mode, and the Java
+pack's delivery mode/URL/SHA-1/self-host port (never anything secret).
 
 ## LuckPerms-backed visibility (network-wide)
 

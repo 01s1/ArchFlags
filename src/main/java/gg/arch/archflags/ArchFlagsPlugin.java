@@ -55,11 +55,15 @@ public final class ArchFlagsPlugin extends JavaPlugin {
 
         var flagCommand = getCommand("flag");
         if (flagCommand != null) {
-            flagCommand.setExecutor(new FlagsCommand(this));
+            var flagsCommand = new FlagsCommand(this);
+            flagCommand.setExecutor(flagsCommand);
+            flagCommand.setTabCompleter(flagsCommand);
         }
         var adminCommand = getCommand("archflags");
         if (adminCommand != null) {
-            adminCommand.setExecutor(new ArchFlagsAdminCommand(this));
+            var archFlagsAdminCommand = new ArchFlagsAdminCommand(this);
+            adminCommand.setExecutor(archFlagsAdminCommand);
+            adminCommand.setTabCompleter(archFlagsAdminCommand);
         }
 
         Bukkit.getServicesManager().register(ArchFlagsService.class, new ArchFlagsServiceImpl(this), this, ServicePriority.Normal);

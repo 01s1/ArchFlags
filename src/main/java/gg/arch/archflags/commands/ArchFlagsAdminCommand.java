@@ -2,15 +2,24 @@ package gg.arch.archflags.commands;
 
 import gg.arch.archflags.ArchFlagsPlugin;
 import gg.arch.archflags.api.CountryInfo;
+import gg.arch.archflags.resourcepack.JavaResourcePackService;
 import gg.arch.archflags.util.FlagRenderer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.util.StringUtil;
 
 /** /archflags reload | lookup <player> | status -- never reveals a raw IP address. */
-public final class ArchFlagsAdminCommand implements CommandExecutor {
+public final class ArchFlagsAdminCommand implements CommandExecutor, TabCompleter {
+
+    private static final List<String> SUBCOMMANDS = List.of("reload", "lookup", "status");
 
     private final ArchFlagsPlugin plugin;
 
@@ -25,7 +34,7 @@ public final class ArchFlagsAdminCommand implements CommandExecutor {
             return true;
         }
 
-        switch (args[0].toLowerCase(java.util.Locale.ROOT)) {
+        switch (args[0].toLowerCase(Locale.ROOT)) {
             case "reload" -> {
                 if (!requirePermission(sender, "archflags.admin.reload")) return true;
                 plugin.reload();
@@ -42,6 +51,21 @@ public final class ArchFlagsAdminCommand implements CommandExecutor {
             default -> sender.sendMessage("Usage: /archflags <reload|lookup <player>|status>");
         }
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (args.length == 1) {
+            List<String> allowed = SUBCOMMANDS.stream()
+                    .filter(sub -> sender.hasPermission("archflags.admin." + sub))
+                    .collect(Collectors.toList());
+            return StringUtil.copyPartialMatches(args[0], allowed, new ArrayList<>());
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("lookup") && sender.hasPermission("archflags.admin.lookup")) {
+            List<String> names = Bukkit.getOnlinePlayers().stream().map(p -> p.getName()).collect(Collectors.toList());
+            return StringUtil.copyPartialMatches(args[1], names, new ArrayList<>());
+        }
+        return List.of();
     }
 
     private boolean requirePermission(CommandSender sender, String permission) {
@@ -82,15 +106,28 @@ public final class ArchFlagsAdminCommand implements CommandExecutor {
 
     private void status(CommandSender sender) {
         var cfg = plugin.archConfig();
+        var pack = plugin.resourcePackService();
         sender.sendMessage(cfg.prefixedMessage("status-header"));
         sender.sendMessage("GeoIP database loaded: " + plugin.geoIpService().isAvailable());
         sender.sendMessage("Glyph mapping loaded: " + plugin.glyphMapping().isLoaded() + " (" + plugin.glyphMapping().size() + " countries)");
         sender.sendMessage("Display mode: " + cfg.displayMode() + " (fallback " + cfg.fallbackMode() + ")");
-        sender.sendMessage("LuckPerms hooked: " + plugin.visibilityStore().isLuckPermsAvailable());
+        sender.sendMessage("LuckPerms hook: " + (plugin.visibilityStore().isLuckPermsAvailable() ? "available" : "unavailable"));
         sender.sendMessage("PlaceholderAPI hooked: " + (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null));
-        sender.sendMessage("TAB hooked (immediate refresh): " + plugin.tabIntegration().isAvailable());
-        sender.sendMessage("Floodgate hooked (Bedrock detection): " + plugin.floodgateIntegration().isAvailable());
-        sender.sendMessage("Java resource pack: " + (cfg.javaPackEnabled() ? "enabled" : "disabled"));
+        sender.sendMessage("TAB hook: " + (plugin.tabIntegration().isAvailable() ? "available" : "unavailable"));
+        sender.sendMessage("Bedrock detection: " + plugin.floodgateIntegration().detectionModeDescription());
+        sender.sendMessage("Java pack enabled: " + pack.isEnabled());
+        sender.sendMessage("Delivery mode: " + describeDeliveryMode(pack));
+        sender.sendMessage("Pack URL: " + (pack.packUri() != null ? pack.packUri() : "(none)"));
+        sender.sendMessage("Pack SHA1: " + (pack.sha1() != null ? pack.sha1() : "(none)"));
+        sender.sendMessage("Self-host port: " + pack.selfHostPort());
         sender.sendMessage("Debug: " + cfg.debug());
+    }
+
+    private String describeDeliveryMode(JavaResourcePackService pack) {
+        return switch (pack.deliveryMode()) {
+            case EXTERNAL -> "external";
+            case SELF_HOST -> "self-host";
+            case DISABLED -> "disabled";
+        };
     }
 }
