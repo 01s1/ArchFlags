@@ -9,21 +9,6 @@
     "packDescription": "ArchFlags country flags (nametag glyphs only) - independent of NxRanks"
   },
   "bedrock": {
-    "cellSize": 16,
-    "packName": "ArchFlags Flags",
-    "packDescription": "ArchFlags country flags (nametag glyphs only) - independent of NxRanks",
-    "headerUuid": "903294ae-d8b5-4e2d-bd24-43b845255973",
-    "moduleUuid": "d7ca77eb-00c1-42bf-bad2-7de228625817",
-    "minEngineVersion": [
-      1,
-      21,
-      0
-    ],
-    "version": [
-      1,
-      0,
-      1
-    ],
-    "lastContentHash": "3fc32cf102353d768d31e2456960b7fc7572b0013f608a0fa62f7fcf16750d34"
+    "cellSize": 16
   }
 }

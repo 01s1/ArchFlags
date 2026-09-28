@@ -35,10 +35,13 @@ nametag:
 #
 # IMPORTANT: E200-E2F9 is ArchFlags' own, separate private-use-area range.
 # NxRanks uses E9xx for its own glyphs on this network -- never change
-# start-codepoint to something inside E900-E9FF, and never merge these
-# generated assets into NxRanks' resource pack (see resourcepack: below and
-# README.md). If you do change this, re-run tools/asset-generator and update
-# nothing else here manually -- the mapping file is regenerated for you.
+# start-codepoint to something inside E900-E9FF. The Java pack stays fully
+# independent (see resourcepack.java below); the Bedrock glyph sheet is
+# merged into the network's single existing Bedrock pack instead (see
+# tools/asset-generator/merge-bedrock.mjs and README.md "Bedrock pack") --
+# it only ever touches its own E2xx sheet file, never NxRanks' E9xx one. If
+# you change this, re-run tools/asset-generator and update nothing else here
+# manually -- the mapping file is regenerated for you.
 glyphs:
   start-codepoint: "E200"
   mapping-file: "glyph-mapping.yml"
@@ -50,8 +53,11 @@ glyphs:
 # NxRanks update, and updating NxRanks never removes it. Only used in CUSTOM_GLYPH mode; leave
 # resourcepack.java.enabled: false if you only use UNICODE/COUNTRY_CODE modes.
 #
-# The Bedrock pack is NOT sent by this plugin -- Geyser reads Bedrock packs from its own
-# Geyser-Velocity/packs/ folder. Copy output/ArchFlags-Bedrock.zip there by hand; see README.md.
+# Bedrock works differently ON PURPOSE: this plugin does NOT send or ship a separate Bedrock
+# pack (an earlier version did, and it broke custom glyph rendering for both packs in practice).
+# Instead, ArchFlags' Bedrock glyph sheet is merged into the network's existing, known-good
+# Bedrock pack (tools/asset-generator/merge-bedrock.mjs) so Geyser only ever loads ONE Bedrock
+# pack. See README.md "Bedrock pack".
 resourcepack:
   java:
     enabled: true

@@ -2,14 +2,16 @@
   "name": "archflags-asset-generator",
   "version": "1.0.0",
   "private": true,
-  "description": "Generates ArchFlags' Java/Bedrock flag glyph assets and glyph-mapping.yml from flags-source/.",
+  "description": "Generates ArchFlags' Java pack + Bedrock glyph sheets + glyph-mapping.yml from flags-source/, and merges the Bedrock sheets into an existing Bedrock pack.",
   "type": "module",
   "scripts": {
-    "generate": "node generate.mjs"
+    "generate": "node generate.mjs",
+    "merge-bedrock": "node merge-bedrock.mjs"
   },
   "author": "ARCH",
   "license": "MIT",
   "dependencies": {
+    "adm-zip": "^0.6.1",
     "archiver": "^8.0.0",
     "js-yaml": "^5.4.2",
     "sharp": "^0.35.4"

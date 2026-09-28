@@ -3,33 +3,37 @@
 //
 // Reads ISO 3166-1 alpha-2 country flag SVGs from ./flags-source (sourced from
 // lipis/flag-icons, MIT licensed -- see THIRD_PARTY_LICENSES/flag-icons-LICENSE.txt
-// and README.md in this directory) and produces two fully INDEPENDENT resource packs
-// (never merged into NxRanks) plus the plugin's glyph mapping:
+// and README.md in this directory) and produces:
 //
 //   - ../../output/java/...                    -- Java pack source tree (assets/, pack.mcmeta)
-//   - ../../output/ArchFlags-Java.zip           -- zipped Java pack (also embedded in the plugin jar)
-//   - ../../output/bedrock/...                  -- Bedrock pack source tree (textures/, manifest.json)
-//   - ../../output/ArchFlags-Bedrock.zip        -- zipped Bedrock pack (copy manually to Geyser-Velocity/packs/)
+//   - ../../output/ArchFlags-Java.zip           -- zipped Java pack (also embedded in the plugin jar,
+//                                                   sent independently by the plugin itself)
+//   - ../../output/bedrock/textures/font/glyph_EN.png -- raw Bedrock glyph sheet(s), NOT a
+//                                                   standalone pack -- see merge-bedrock.mjs
 //   - ../../output/glyph-mapping.yml            -- country -> codepoint -> name
 //   - ../../output/GENERATION_REPORT.md         -- human-readable summary
+//
+// Bedrock is handled differently from Java on purpose: running ArchFlags' glyphs as a second,
+// separately-active Bedrock resource pack alongside the network's existing pack broke custom
+// glyph rendering for both packs in practice. So this script only produces the raw glyph sheet
+// asset here -- use merge-bedrock.mjs to inject it into your existing, known-good Bedrock pack
+// (e.g. arch-bedrock-corrected.zip) as the single pack Geyser actually loads.
 //
 // The generated glyph-mapping.yml and the Java pack zip are also copied into
 // ../../src/main/resources/ so the plugin ships with a working default mapping and its own
 // resource pack out of the box. Re-run this script any time generator.config.json changes
-// (dimensions, start codepoint, etc.).
+// (dimensions, start codepoint, etc.), then re-run merge-bedrock.mjs.
 //
 // Country codes and English names are NOT hand-typed: this script intersects the flag SVGs
 // on disk with Node's built-in Intl.DisplayNames (ICU's region name data) and a small fixed
 // exclusion list for non-ISO-3166-1 entries -- see NON_ISO_3166_1_CODES below.
 //
 // Glyph codepoints (default U+E200-U+E2F9) are a DIFFERENT, deliberately separate range from
-// NxRanks' own private-use-area glyphs (E9xx) -- ArchFlags never touches that range, and this
-// generator's output never gets merged into NxRanks' packs.
+// NxRanks' own private-use-area glyphs (E9xx) -- ArchFlags never touches that range.
 
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync, rmSync, createWriteStream } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createHash } from "node:crypto";
 import sharp from "sharp";
 import * as yaml from "js-yaml";
 import { ZipArchive } from "archiver";
@@ -40,8 +44,7 @@ const SRC_DIR = join(__dirname, "flags-source");
 const OUT_DIR = join(ROOT, "output");
 const JAVA_PACK_DIR = join(OUT_DIR, "java");
 const JAVA_ASSETS_OUT = join(JAVA_PACK_DIR, "assets", "archflags");
-const BEDROCK_PACK_DIR = join(OUT_DIR, "bedrock");
-const BEDROCK_FONT_OUT = join(BEDROCK_PACK_DIR, "textures", "font");
+const BEDROCK_FONT_OUT = join(OUT_DIR, "bedrock", "textures", "font");
 const RESOURCES_DIR = join(ROOT, "src", "main", "resources");
 const CONFIG_PATH = join(__dirname, "generator.config.json");
 
@@ -168,6 +171,8 @@ async function main() {
         });
 
         // Bedrock: place into the appropriate 16x16 glyph_EN.png sheet, centered in its cell.
+        // This sheet is only ever merged into an existing pack (merge-bedrock.mjs) -- ArchFlags
+        // no longer ships or activates its own separate Bedrock pack.
         const sheetIndex = codepoint >> 8; // e.g. 0xE2 for 0xE200-0xE2FF
         const withinSheet = codepoint & 0xff;
         const row = Math.floor(withinSheet / BEDROCK_GRID);
@@ -191,7 +196,7 @@ async function main() {
         }
     }, null, 2));
 
-    const bedrockSheetBuffers = new Map(); // sheetIndex -> PNG buffer, for hashing + writing
+    const bedrockSheetBuffers = new Map(); // sheetIndex -> PNG buffer
     for (const [sheetIndex, composites] of bedrockSheetComposites.entries()) {
         const size = BEDROCK_GRID * BEDROCK_CELL;
         const buffer = await sharp({
@@ -204,52 +209,6 @@ async function main() {
         const sheetHex = sheetIndex.toString(16).toUpperCase();
         writeFileSync(join(BEDROCK_FONT_OUT, `glyph_${sheetHex}.png`), bedrockSheetBuffers.get(sheetIndex));
     }
-
-    // Bedrock manifest version: bump the patch number only when the actual pixel content (or
-    // cell size) changed since the last run, so Geyser/Bedrock clients don't keep a stale cached
-    // copy -- but don't churn the version (and thus force every client to re-download) on a
-    // no-op re-run. header/module UUIDs stay fixed forever: changing them would make Bedrock
-    // treat this as a brand new pack instead of an update.
-    const contentHash = createHash("sha256");
-    contentHash.update(String(BEDROCK_CELL));
-    for (const sheetIndex of sortedSheetIndices) {
-        contentHash.update(bedrockSheetBuffers.get(sheetIndex));
-    }
-    const newHash = contentHash.digest("hex");
-
-    const bedrockCfg = config.bedrock;
-    let version = Array.isArray(bedrockCfg.version) ? [...bedrockCfg.version] : [1, 0, 0];
-    const contentChanged = bedrockCfg.lastContentHash !== newHash;
-    if (contentChanged) {
-        version[2] = (version[2] ?? 0) + 1;
-        console.log(`Bedrock pack content changed -> bumping manifest version to ${version.join(".")}.`);
-    } else {
-        console.log(`Bedrock pack content unchanged -> keeping manifest version ${version.join(".")}.`);
-    }
-
-    writeFileSync(join(BEDROCK_PACK_DIR, "manifest.json"), JSON.stringify({
-        format_version: 2,
-        header: {
-            name: bedrockCfg.packName,
-            description: bedrockCfg.packDescription,
-            uuid: bedrockCfg.headerUuid,
-            version,
-            min_engine_version: bedrockCfg.minEngineVersion
-        },
-        modules: [
-            {
-                type: "resources",
-                uuid: bedrockCfg.moduleUuid,
-                version
-            }
-        ]
-    }, null, 2));
-
-    // Persist the (possibly bumped) version + hash back into generator.config.json so the next
-    // run knows whether content changed again.
-    config.bedrock.version = version;
-    config.bedrock.lastContentHash = newHash;
-    writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2) + "\n");
 
     const mappingDoc = {
         "start-codepoint": config.startCodepoint,
@@ -265,13 +224,11 @@ async function main() {
     writeFileSync(join(OUT_DIR, "glyph-mapping.yml"), mappingYaml);
     writeFileSync(join(RESOURCES_DIR, "glyph-mapping.yml"), mappingYaml);
 
-    // Zip both packs. The Java pack is also embedded in the plugin jar (the plugin serves/hosts
-    // it itself); the Bedrock pack is NOT embedded -- it's copied by hand to
-    // Geyser-Velocity/packs/ArchFlags-Bedrock.zip, independently of NxRanks' own Bedrock pack.
+    // The Java pack is embedded in the plugin jar (the plugin serves/hosts it itself). The
+    // Bedrock glyph sheet(s) above are NOT zipped into a standalone pack here -- run
+    // merge-bedrock.mjs to inject them into your existing Bedrock pack instead.
     const javaZipPath = join(OUT_DIR, "ArchFlags-Java.zip");
-    const bedrockZipPath = join(OUT_DIR, "ArchFlags-Bedrock.zip");
     await zipDirectory(JAVA_PACK_DIR, javaZipPath);
-    await zipDirectory(BEDROCK_PACK_DIR, bedrockZipPath);
     writeFileSync(join(RESOURCES_DIR, "archflags-java-pack.zip"), readFileSync(javaZipPath));
 
     const sheetList = sortedSheetIndices.map((s) => `glyph_${s.toString(16).toUpperCase()}.png`);
@@ -282,19 +239,20 @@ async function main() {
         `Countries: ${accepted.length}`,
         `Flag glyph dimensions: ${WIDTH}x${HEIGHT}px`,
         `Codepoint range: U+${START_CODEPOINT.toString(16).toUpperCase()} - U+${(START_CODEPOINT + accepted.length - 1).toString(16).toUpperCase()} (separate from NxRanks' E9xx range)`,
-        `Java pack: ${javaZipPath} (pack_format ${config.java.packFormat}, embedded in the plugin jar)`,
-        `Bedrock pack: ${bedrockZipPath} (manifest version ${version.join(".")}, ${contentChanged ? "bumped this run" : "unchanged this run"})`,
-        `Bedrock sheets: ${sheetList.join(", ")}`,
+        `Java pack: ${javaZipPath} (pack_format ${config.java.packFormat}, embedded in the plugin jar, sent independently)`,
+        `Bedrock glyph sheet(s): ${sheetList.map((s) => join(BEDROCK_FONT_OUT, s)).join(", ")}`,
+        `  -> NOT a standalone pack. Run: node merge-bedrock.mjs --pack <path-to-arch-bedrock-corrected.zip>`,
         `Skipped non-ISO-3166-1 source files: ${skippedNonIso.join(", ") || "(none)"}`,
         "",
-        "Both packs are independent -- neither is merged into NxRanks. See README.md for how",
-        "the Java pack is self-served by the plugin and where to copy the Bedrock pack."
+        "Java stays independent (its own pack, sent by the plugin). Bedrock is merged into the",
+        "network's single existing pack instead -- see README.md and merge-bedrock.mjs."
     ].join("\n");
     writeFileSync(join(OUT_DIR, "GENERATION_REPORT.md"), report + "\n");
 
     console.log(`Wrote ${accepted.length} flags. Codepoints U+${START_CODEPOINT.toString(16).toUpperCase()}-U+${(START_CODEPOINT + accepted.length - 1).toString(16).toUpperCase()}.`);
     console.log(`Java pack: ${javaZipPath}`);
-    console.log(`Bedrock pack: ${bedrockZipPath} (manifest version ${version.join(".")})`);
+    console.log(`Bedrock glyph sheet(s): ${sheetList.join(", ")} in ${BEDROCK_FONT_OUT}`);
+    console.log("Next: node merge-bedrock.mjs --pack <path-to-arch-bedrock-corrected.zip>");
     console.log("Done.");
 }
 
