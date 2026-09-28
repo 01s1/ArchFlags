@@ -8,7 +8,10 @@
 // Bedrock pack should ever be active in Geyser-Velocity/packs/.
 //
 // This script only ever touches:
-//   - textures/font/glyph_EN.png for each sheet ArchFlags generated (added or replaced)
+//   - one glyph_EN.png entry per sheet ArchFlags generated (added or replaced) -- at whatever
+//     directory the TARGET pack's own existing glyph sheet(s) already live at (see
+//     detectGlyphDirPrefix below), NOT necessarily the "textures/font/" convention docs describe.
+//     Real-world packs vary -- e.g. a Nexo-generated pack may keep them at bare "font/" instead.
 //   - manifest.json's version numbers (bumped only if content actually changed)
 //   - a small archflags/.merge-state.json marker (tracks what WE last wrote, so re-running this
 //     doesn't confuse "we updated our own glyphs" with "someone else's file is already there")
@@ -55,7 +58,7 @@ function printUsageAndExit(code) {
     process.exit(code);
 }
 
-function loadSheets() {
+function loadSheetFiles() {
     if (!existsSync(BEDROCK_FONT_DIR)) {
         console.error(`No generated Bedrock glyph sheets found at ${BEDROCK_FONT_DIR}.`);
         console.error("Run `node generate.mjs` first.");
@@ -66,10 +69,27 @@ function loadSheets() {
         console.error(`No glyph_EN.png sheets found in ${BEDROCK_FONT_DIR}. Run \`node generate.mjs\` first.`);
         process.exit(1);
     }
-    return files.map((f) => ({
-        entryPath: `textures/font/${f}`,
-        bytes: readFileSync(join(BEDROCK_FONT_DIR, f))
-    }));
+    return files;
+}
+
+// Bedrock's documented convention is "textures/font/glyph_EN.png", but real packs vary -- the
+// only thing that actually matters is matching wherever THIS pack's own glyph sheets already
+// live, since that's what's proven to already work with it. Detect it from any existing
+// "*font/glyph_XX.png" entry (NxRanks' own sheet, most likely) rather than assuming.
+function detectGlyphDirPrefix(zip, warnings) {
+    const pattern = /^(.*?)font\/glyph_[0-9A-Fa-f]{1,2}\.png$/i;
+    for (const entry of zip.getEntries()) {
+        const match = entry.entryName.match(pattern);
+        if (match) {
+            const prefix = `${match[1]}font/`;
+            console.log(`Detected existing glyph sheet path convention in this pack: "${prefix}" (from ${entry.entryName}).`);
+            return prefix;
+        }
+    }
+    const fallback = "textures/font/";
+    warnings.push(`Could not find any existing "font/glyph_XX.png" entry in this pack to match its path convention -- `
+        + `falling back to the standard "${fallback}". Verify this is correct for your pack.`);
+    return fallback;
 }
 
 function bumpVersion(version, label, warnings) {
@@ -90,7 +110,7 @@ function main() {
         process.exit(1);
     }
 
-    const sheets = loadSheets();
+    const sheetFiles = loadSheetFiles();
     const zip = new AdmZip(args.pack);
 
     const manifestEntry = zip.getEntry("manifest.json");
@@ -121,6 +141,12 @@ function main() {
     const added = [];
     const updated = [];
     let anyChanged = false;
+
+    const glyphDirPrefix = detectGlyphDirPrefix(zip, warnings);
+    const sheets = sheetFiles.map((f) => ({
+        entryPath: `${glyphDirPrefix}${f}`,
+        bytes: readFileSync(join(BEDROCK_FONT_DIR, f))
+    }));
 
     for (const sheet of sheets) {
         const newHash = sha256(sheet.bytes);

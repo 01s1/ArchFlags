@@ -167,10 +167,13 @@ This writes `arch-bedrock-corrected-merged.zip` next to your input file (your or
 untouched so you can verify the result first) -- pass `--in-place` to overwrite the input
 directly instead, or `--out <path>` for a specific output location. `merge-bedrock.mjs`:
 
-- Only ever **adds or replaces `textures/font/glyph_E2.png`** (ArchFlags' own sheet, inside its
-  own `E200`-`E2F9` range) inside your pack.
-- **Never touches anything else** -- NxRanks' `textures/font/glyph_E9.png` (its `E9xx` range)
-  and every other file in your pack are copied through byte-for-byte, untouched.
+- Only ever **adds or replaces `glyph_E2.png`** (ArchFlags' own sheet, inside its own
+  `E200`-`E2F9` range), at whatever directory your pack's own existing glyph sheet(s) already
+  live at -- it auto-detects this from your pack rather than assuming the documented
+  `textures/font/` convention, since real packs vary (a Nexo-generated pack, for example, may
+  keep them at bare `font/` instead). It logs which path it detected and used.
+- **Never touches anything else** -- NxRanks' own `glyph_E9.png` (its `E9xx` range) and every
+  other file in your pack are copied through byte-for-byte, untouched.
 - Bumps your pack's `manifest.json` version (`header.version` and every entry in `modules[]`,
   keeping your existing header/module UUIDs exactly as they are) *only* when ArchFlags' glyph
   content actually changed since the last merge, so Geyser/Bedrock clients don't keep a stale

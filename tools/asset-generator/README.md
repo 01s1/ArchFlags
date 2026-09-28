@@ -83,10 +83,15 @@ directly, or `--out <path>` to pick a specific output location.
 
 What it does, precisely:
 
-- Reads every `textures/font/glyph_EN.png` sheet from `output/bedrock/` (produced in Step 1) and
-  adds or replaces each one, at that exact same path, inside a copy of your target pack.
+- Reads every `glyph_EN.png` sheet from `output/bedrock/textures/font/` (produced in Step 1).
+  Before writing them, it scans your target pack for any existing `.../font/glyph_XX.png` entry
+  (most likely NxRanks' own sheet) and reuses **that exact directory** -- it does not assume the
+  documented `textures/font/` convention, since real packs vary (e.g. a Nexo-generated pack may
+  keep them at bare `font/` instead). It logs the path it detected, or falls back to
+  `textures/font/` with an explicit warning if the target pack has no existing glyph sheet at all
+  to detect from.
 - Touches **nothing else** in your pack -- every other file (including NxRanks' own
-  `textures/font/glyph_E9.png`) is copied through byte-for-byte.
+  `glyph_E9.png`) is copied through byte-for-byte.
 - Reads and updates your target pack's `manifest.json`: bumps `header.version` and every entry
   in `modules[]`'s patch number, but **only when ArchFlags' glyph content actually changed**
   since the last merge (tracked via a small `archflags/.merge-state.json` marker written inside
@@ -94,10 +99,10 @@ What it does, precisely:
   Re-running the merge with no real change leaves the version untouched. Your pack's existing
   header/module UUIDs are never changed -- changing them would make Geyser treat the result as a
   brand new pack instead of an update to the one it already has cached.
-- If it finds something already at `textures/font/glyph_E2.png` that it didn't write itself on a
-  previous run (a real naming collision, or a manually-edited file), it prints an explicit
-  `WARNING:` line rather than silently clobbering it -- then still overwrites it, since that path
-  is inside ArchFlags' own declared range.
+- If it finds something already at `glyph_E2.png` (at the detected path) that it didn't write
+  itself on a previous run (a real naming collision, or a manually-edited file), it prints an
+  explicit `WARNING:` line rather than silently clobbering it -- then still overwrites it, since
+  that path is inside ArchFlags' own declared range.
 
 Copy the resulting zip into `Geyser-Velocity/packs/` as your **one** active Bedrock pack. Delete
 any leftover standalone `ArchFlags-Bedrock.zip` from an older ArchFlags version if one is still
