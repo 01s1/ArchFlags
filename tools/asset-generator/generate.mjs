@@ -5,38 +5,50 @@
 // lipis/flag-icons, MIT licensed -- see THIRD_PARTY_LICENSES/flag-icons-LICENSE.txt
 // and README.md in this directory) and produces:
 //
-//   - ../../output/java/assets/archflags/textures/font/flags/<code>.png   (one per country)
-//   - ../../output/java/assets/archflags/font/flags.json                 (Java bitmap font provider list)
-//   - ../../output/bedrock/textures/font/glyph_EN.png                    (16x16 Bedrock glyph sheet(s))
-//   - ../../output/glyph-mapping.yml                                     (country -> codepoint -> name)
-//   - ../../output/GENERATION_REPORT.md                                  (human-readable summary)
+//   - ../../output/java/...                    -- Java pack source tree (assets/, pack.mcmeta)
+//   - ../../output/ArchFlags-Java.zip           -- zipped Java pack (also embedded in the plugin jar,
+//                                                   sent independently by the plugin itself)
+//   - ../../output/bedrock/textures/font/glyph_EN.png -- raw Bedrock glyph sheet(s), NOT a
+//                                                   standalone pack -- see merge-bedrock.mjs
+//   - ../../output/glyph-mapping.yml            -- country -> codepoint -> name
+//   - ../../output/GENERATION_REPORT.md         -- human-readable summary
 //
-// The generated glyph-mapping.yml is also copied to
-// ../../src/main/resources/glyph-mapping.yml so the plugin ships with a working
-// default mapping out of the box. Re-run this script any time generator.config.json
-// changes (dimensions, start codepoint, etc.) and re-copy that file if you edit the
-// copy step out.
+// Bedrock is handled differently from Java on purpose: running ArchFlags' glyphs as a second,
+// separately-active Bedrock resource pack alongside the network's existing pack broke custom
+// glyph rendering for both packs in practice. So this script only produces the raw glyph sheet
+// asset here -- use merge-bedrock.mjs to inject it into your existing, known-good Bedrock pack
+// (e.g. arch-bedrock-corrected.zip) as the single pack Geyser actually loads.
 //
-// Country codes and English names are NOT hand-typed: this script intersects the
-// flag SVGs on disk with Node's built-in Intl.supportedValuesOf('region') (ICU's
-// canonical ISO 3166-1 region list) and asks Intl.DisplayNames for each name, so
-// adding/removing a country is just adding/removing an SVG file.
+// The generated glyph-mapping.yml and the Java pack zip are also copied into
+// ../../src/main/resources/ so the plugin ships with a working default mapping and its own
+// resource pack out of the box. Re-run this script any time generator.config.json changes
+// (dimensions, start codepoint, etc.), then re-run merge-bedrock.mjs.
+//
+// Country codes and English names are NOT hand-typed: this script intersects the flag SVGs
+// on disk with Node's built-in Intl.DisplayNames (ICU's region name data) and a small fixed
+// exclusion list for non-ISO-3166-1 entries -- see NON_ISO_3166_1_CODES below.
+//
+// Glyph codepoints (default U+E200-U+E2F9) are a DIFFERENT, deliberately separate range from
+// NxRanks' own private-use-area glyphs (E9xx) -- ArchFlags never touches that range.
 
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync, rmSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync, rmSync, createWriteStream } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import * as yaml from "js-yaml";
+import { ZipArchive } from "archiver";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..", "..");
 const SRC_DIR = join(__dirname, "flags-source");
 const OUT_DIR = join(ROOT, "output");
-const JAVA_OUT = join(OUT_DIR, "java", "assets", "archflags");
-const BEDROCK_OUT = join(OUT_DIR, "bedrock", "textures", "font");
+const JAVA_PACK_DIR = join(OUT_DIR, "java");
+const JAVA_ASSETS_OUT = join(JAVA_PACK_DIR, "assets", "archflags");
+const BEDROCK_FONT_OUT = join(OUT_DIR, "bedrock", "textures", "font");
 const RESOURCES_DIR = join(ROOT, "src", "main", "resources");
+const CONFIG_PATH = join(__dirname, "generator.config.json");
 
-const config = JSON.parse(readFileSync(join(__dirname, "generator.config.json"), "utf8"));
+const config = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
 const WIDTH = config.width;
 const HEIGHT = config.height;
 const START_CODEPOINT = parseInt(config.startCodepoint, 16);
@@ -103,6 +115,18 @@ async function renderFlagPng(code) {
         .toBuffer();
 }
 
+function zipDirectory(sourceDir, outFile) {
+    return new Promise((resolve, reject) => {
+        const output = createWriteStream(outFile);
+        const archive = new ZipArchive({ zlib: { level: 9 } });
+        output.on("close", () => resolve());
+        archive.on("error", reject);
+        archive.pipe(output);
+        archive.directory(sourceDir, false);
+        archive.finalize();
+    });
+}
+
 async function main() {
     if (!existsSync(SRC_DIR)) {
         console.error(`Missing flags-source directory: ${SRC_DIR}`);
@@ -116,13 +140,13 @@ async function main() {
         console.log(`Skipped ${skippedNonIso.length} non-ISO-3166-1 entries: ${skippedNonIso.join(", ")}`);
     }
 
-    resetDir(join(JAVA_OUT, "textures", "font", "flags"));
-    mkdirSync(join(JAVA_OUT, "font"), { recursive: true });
-    resetDir(BEDROCK_OUT);
+    resetDir(join(JAVA_ASSETS_OUT, "textures", "font", "flags"));
+    mkdirSync(join(JAVA_ASSETS_OUT, "font"), { recursive: true });
+    resetDir(BEDROCK_FONT_OUT);
 
     const mapping = {};
     const javaProviders = [];
-    const bedrockSheets = new Map(); // sheetIndex -> sharp composite ops
+    const bedrockSheetComposites = new Map(); // sheetIndex -> sharp composite ops
 
     for (let i = 0; i < accepted.length; i++) {
         const code = accepted[i];
@@ -134,7 +158,7 @@ async function main() {
         const png = await renderFlagPng(code);
 
         // Java: one bitmap-font provider per glyph, referencing its own small texture.
-        writeFileSync(join(JAVA_OUT, "textures", "font", "flags", `${lower}.png`), png);
+        writeFileSync(join(JAVA_ASSETS_OUT, "textures", "font", "flags", `${lower}.png`), png);
         javaProviders.push({
             type: "bitmap",
             file: `archflags:font/flags/${lower}.png`,
@@ -147,27 +171,43 @@ async function main() {
         });
 
         // Bedrock: place into the appropriate 16x16 glyph_EN.png sheet, centered in its cell.
+        // This sheet is only ever merged into an existing pack (merge-bedrock.mjs) -- ArchFlags
+        // no longer ships or activates its own separate Bedrock pack.
         const sheetIndex = codepoint >> 8; // e.g. 0xE2 for 0xE200-0xE2FF
         const withinSheet = codepoint & 0xff;
         const row = Math.floor(withinSheet / BEDROCK_GRID);
         const col = withinSheet % BEDROCK_GRID;
         const left = col * BEDROCK_CELL + Math.round((BEDROCK_CELL - WIDTH) / 2);
         const top = row * BEDROCK_CELL + Math.round((BEDROCK_CELL - HEIGHT) / 2);
-        if (!bedrockSheets.has(sheetIndex)) bedrockSheets.set(sheetIndex, []);
-        bedrockSheets.get(sheetIndex).push({ input: png, left: Math.max(0, left), top: Math.max(0, top) });
+        if (!bedrockSheetComposites.has(sheetIndex)) bedrockSheetComposites.set(sheetIndex, []);
+        bedrockSheetComposites.get(sheetIndex).push({ input: png, left: Math.max(0, left), top: Math.max(0, top) });
 
         mapping[code] = { codepoint: hex, name };
     }
 
-    writeFileSync(join(JAVA_OUT, "font", "flags.json"), JSON.stringify({ providers: javaProviders }, null, 2));
+    writeFileSync(join(JAVA_ASSETS_OUT, "font", "flags.json"), JSON.stringify({ providers: javaProviders }, null, 2));
 
-    for (const [sheetIndex, composites] of bedrockSheets.entries()) {
-        const sheetHex = sheetIndex.toString(16).toUpperCase();
+    // Java pack.mcmeta -- pack_format 75 = Minecraft 1.21.11 (see tools/asset-generator/README.md
+    // if this ever needs bumping for a newer Minecraft version).
+    writeFileSync(join(JAVA_PACK_DIR, "pack.mcmeta"), JSON.stringify({
+        pack: {
+            pack_format: config.java.packFormat,
+            description: config.java.packDescription
+        }
+    }, null, 2));
+
+    const bedrockSheetBuffers = new Map(); // sheetIndex -> PNG buffer
+    for (const [sheetIndex, composites] of bedrockSheetComposites.entries()) {
         const size = BEDROCK_GRID * BEDROCK_CELL;
-        const sheet = sharp({
+        const buffer = await sharp({
             create: { width: size, height: size, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } }
-        }).composite(composites);
-        await sheet.png().toFile(join(BEDROCK_OUT, `glyph_${sheetHex}.png`));
+        }).composite(composites).png().toBuffer();
+        bedrockSheetBuffers.set(sheetIndex, buffer);
+    }
+    const sortedSheetIndices = [...bedrockSheetBuffers.keys()].sort((a, b) => a - b);
+    for (const sheetIndex of sortedSheetIndices) {
+        const sheetHex = sheetIndex.toString(16).toUpperCase();
+        writeFileSync(join(BEDROCK_FONT_OUT, `glyph_${sheetHex}.png`), bedrockSheetBuffers.get(sheetIndex));
     }
 
     const mappingDoc = {
@@ -184,26 +224,35 @@ async function main() {
     writeFileSync(join(OUT_DIR, "glyph-mapping.yml"), mappingYaml);
     writeFileSync(join(RESOURCES_DIR, "glyph-mapping.yml"), mappingYaml);
 
-    const sheetList = [...bedrockSheets.keys()]
-        .sort((a, b) => a - b)
-        .map((s) => `glyph_${s.toString(16).toUpperCase()}.png`);
+    // The Java pack is embedded in the plugin jar (the plugin serves/hosts it itself). The
+    // Bedrock glyph sheet(s) above are NOT zipped into a standalone pack here -- run
+    // merge-bedrock.mjs to inject them into your existing Bedrock pack instead.
+    const javaZipPath = join(OUT_DIR, "ArchFlags-Java.zip");
+    await zipDirectory(JAVA_PACK_DIR, javaZipPath);
+    writeFileSync(join(RESOURCES_DIR, "archflags-java-pack.zip"), readFileSync(javaZipPath));
+
+    const sheetList = sortedSheetIndices.map((s) => `glyph_${s.toString(16).toUpperCase()}.png`);
     const report = [
         "# ArchFlags asset generation report",
         "",
         `Generated: ${new Date().toISOString()}`,
         `Countries: ${accepted.length}`,
         `Flag glyph dimensions: ${WIDTH}x${HEIGHT}px`,
-        `Codepoint range: U+${START_CODEPOINT.toString(16).toUpperCase()} - U+${(START_CODEPOINT + accepted.length - 1).toString(16).toUpperCase()}`,
-        `Bedrock sheets written: ${sheetList.join(", ")}`,
+        `Codepoint range: U+${START_CODEPOINT.toString(16).toUpperCase()} - U+${(START_CODEPOINT + accepted.length - 1).toString(16).toUpperCase()} (separate from NxRanks' E9xx range)`,
+        `Java pack: ${javaZipPath} (pack_format ${config.java.packFormat}, embedded in the plugin jar, sent independently)`,
+        `Bedrock glyph sheet(s): ${sheetList.map((s) => join(BEDROCK_FONT_OUT, s)).join(", ")}`,
+        `  -> NOT a standalone pack. Run: node merge-bedrock.mjs --pack <path-to-arch-bedrock-corrected.zip>`,
         `Skipped non-ISO-3166-1 source files: ${skippedNonIso.join(", ") || "(none)"}`,
         "",
-        "See README.md for licensing/attribution and how to merge output/java and",
-        "output/bedrock into the existing NxRanks resource packs."
+        "Java stays independent (its own pack, sent by the plugin). Bedrock is merged into the",
+        "network's single existing pack instead -- see README.md and merge-bedrock.mjs."
     ].join("\n");
     writeFileSync(join(OUT_DIR, "GENERATION_REPORT.md"), report + "\n");
 
     console.log(`Wrote ${accepted.length} flags. Codepoints U+${START_CODEPOINT.toString(16).toUpperCase()}-U+${(START_CODEPOINT + accepted.length - 1).toString(16).toUpperCase()}.`);
-    console.log(`Bedrock sheets: ${sheetList.join(", ")}`);
+    console.log(`Java pack: ${javaZipPath}`);
+    console.log(`Bedrock glyph sheet(s): ${sheetList.join(", ")} in ${BEDROCK_FONT_OUT}`);
+    console.log("Next: node merge-bedrock.mjs --pack <path-to-arch-bedrock-corrected.zip>");
     console.log("Done.");
 }
 

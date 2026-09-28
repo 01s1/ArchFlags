@@ -32,11 +32,73 @@ nametag:
 # (or any MiniMessage-aware renderer) picks the right custom font for the
 # glyph automatically. Only used in CUSTOM_GLYPH mode. See README.md ->
 # "TAB integration" for how to reference this in TAB's nametag config.
+#
+# IMPORTANT: E200-E2F9 is ArchFlags' own, separate private-use-area range.
+# NxRanks uses E9xx for its own glyphs on this network -- never change
+# start-codepoint to something inside E900-E9FF. The Java pack stays fully
+# independent (see resourcepack.java below); the Bedrock glyph sheet is
+# merged into the network's single existing Bedrock pack instead (see
+# tools/asset-generator/merge-bedrock.mjs and README.md "Bedrock pack") --
+# it only ever touches its own E2xx sheet file, never NxRanks' E9xx one. If
+# you change this, re-run tools/asset-generator and update nothing else here
+# manually -- the mapping file is regenerated for you.
 glyphs:
   start-codepoint: "E200"
   mapping-file: "glyph-mapping.yml"
   wrap-minimessage: true
   font-key: "archflags:flags"
+
+# ArchFlags' own, fully independent Java resource pack (never merged into NxRanks'). Sent
+# additively alongside whatever pack(s) NxRanks already sends -- it is never replaced by an
+# NxRanks update, and updating NxRanks never removes it. Only used in CUSTOM_GLYPH mode; leave
+# resourcepack.java.enabled: false if you only use UNICODE/COUNTRY_CODE modes.
+#
+# Bedrock works differently ON PURPOSE: this plugin does NOT send or ship a separate Bedrock
+# pack (an earlier version did, and it broke custom glyph rendering for both packs in practice).
+# Instead, ArchFlags' Bedrock glyph sheet is merged into the network's existing, known-good
+# Bedrock pack (tools/asset-generator/merge-bedrock.mjs) so Geyser only ever loads ONE Bedrock
+# pack. See README.md "Bedrock pack".
+resourcepack:
+  java:
+    enabled: true
+    # RECOMMENDED for a real network: host output/ArchFlags-Java.zip on your own web
+    # server/CDN and put that URL here. Since HUB, SMP, and SURVIVAL all ship the exact same
+    # pack, point all three backends at this ONE url so you don't need a different self-host
+    # port open per server. Leave blank to fall back to self-hosting instead (below).
+    url: ""
+    # Vanilla clients disconnect themselves if a *required* pack is rejected/fails -- leave this
+    # false unless you're sure every player can actually reach the pack URL.
+    required: false
+    prompt: "&bArchFlags needs its small flag pack alongside your other resource packs."
+    # Fallback only used when url above is blank. Fine for testing; for production, prefer an
+    # externally-hosted url instead so you're not running an HTTP server on every backend.
+    self-host:
+      enabled: true
+      bind-address: "0.0.0.0"
+      # If HUB/SMP/SURVIVAL run on the same machine, each server needs its OWN port here.
+      port: 25566
+      # REQUIRED when self-host is enabled and url above is blank: the host/IP players'
+      # clients can actually reach (your domain or public IP) -- not 0.0.0.0 or 127.0.0.1.
+      public-address: ""
+
+# Bedrock-player detection, used only to decide whether to send the Java resource pack above
+# (Bedrock clients never need it -- they get ArchFlags-Bedrock.zip via Geyser instead).
+#
+# IMPORTANT for this network: Geyser + Floodgate run on the VELOCITY PROXY, not on this backend.
+# That means Floodgate's own reliable detection API is only reachable here if the Floodgate
+# plugin is ALSO installed on this backend server, with the same key.pem as the proxy's
+# plugins/floodgate/key.pem -- see https://geysermc.org/wiki/floodgate/setup/proxy-servers/ and
+# README.md "Bedrock detection". Startup logs say clearly which mode is active.
+bedrock-detection:
+  # Optional stopgap ONLY for when backend Floodgate isn't installed. NOT an officially
+  # guaranteed Floodgate API -- Floodgate rewrites a Bedrock player's visible Java username with
+  # this prefix on the proxy before forwarding them anywhere, so it's often still visible here,
+  # but it breaks if this prefix is set to empty on the proxy. Prefer installing backend
+  # Floodgate instead when you can.
+  username-prefix-fallback:
+    enabled: false
+    # Must match Floodgate's own "username-prefix" setting on the proxy.
+    prefix: "."
 
 luckperms:
   # LuckPerms meta node used to persist flag visibility network-wide.
@@ -51,11 +113,13 @@ cache:
   retain-after-quit-minutes: 30
 
 messages:
-  prefix: "&8[&bArchFlags&8] &r"
-  flag-enabled: "&aFlag visibility enabled."
-  flag-disabled: "&cFlag visibility disabled."
-  flag-status: "&7Your flag is currently &f%state%&7."
-  no-permission: "&cYou don't have permission to do that."
+  prefix: "&bArchFlags &8» &r"
+  flag-enabled: "&aYour country flag is now visible."
+  flag-disabled: "&cYour country flag is now hidden."
+  flag-status-on: "&fCountry flag: &aON"
+  flag-status-off: "&fCountry flag: &cOFF"
+  flag-usage: "&cUsage: /flag <on|off|toggle|status>"
+  no-permission: "&cYou do not have permission to use this command."
   player-only: "&cThis command can only be used by a player."
   player-not-found: "&cPlayer not found or never joined."
   reload-success: "&aArchFlags configuration reloaded."

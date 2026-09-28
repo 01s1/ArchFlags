@@ -99,6 +99,7 @@ public final class GeoIpService {
             cache.put(uuid, result);
             Bukkit.getScheduler().runTask(plugin, () -> {
                 Bukkit.getPluginManager().callEvent(new ArchCountryResolvedEvent(uuid, result));
+                plugin.tabIntegration().refresh(uuid);
                 future.complete(result);
             });
         });

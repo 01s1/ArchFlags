@@ -4,7 +4,9 @@
   "startCodepoint": "E200",
   "java": {
     "fontHeight": 8,
-    "fontAscent": 7
+    "fontAscent": 7,
+    "packFormat": 75,
+    "packDescription": "ArchFlags country flags (nametag glyphs only) - independent of NxRanks"
   },
   "bedrock": {
     "cellSize": 16

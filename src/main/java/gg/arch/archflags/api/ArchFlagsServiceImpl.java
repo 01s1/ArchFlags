@@ -41,8 +41,10 @@ public final class ArchFlagsServiceImpl implements ArchFlagsService {
     public void setFlagVisible(UUID uuid, boolean visible) {
         boolean previous = plugin.visibilityStore().isVisible(uuid);
         plugin.visibilityStore().setVisible(uuid, visible).thenRun(() ->
-                Bukkit.getScheduler().runTask(plugin, () ->
-                        Bukkit.getPluginManager().callEvent(new ArchFlagVisibilityChangeEvent(uuid, visible, previous))));
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    Bukkit.getPluginManager().callEvent(new ArchFlagVisibilityChangeEvent(uuid, visible, previous));
+                    plugin.tabIntegration().refresh(uuid);
+                }));
     }
 
     @Override
