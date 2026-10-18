@@ -7,6 +7,9 @@ import gg.arch.archflags.events.ArchCountryResolvedEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -16,6 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 /**
@@ -25,8 +29,16 @@ import org.bukkit.scheduler.BukkitTask;
  * The database is opened off the main thread on enable, and every lookup runs on a dedicated
  * single-thread executor -- {@link #getCountry(UUID)} (the only method safe to call from the main
  * thread synchronously) only ever reads an in-memory cache.
+ * <p>
+ * Only successful resolutions are reused from the cache. An Unknown result (database missing,
+ * private address, lookup miss) is retried on the next join, and every online player still
+ * showing Unknown is re-resolved as soon as a database loads, so fixing the .mmdb and running
+ * /archflags reload takes effect without anyone relogging.
  */
 public final class GeoIpService {
+
+    /** MaxMind's GeoLite2 EULA requires replacing the database with each update; it ships weekly. */
+    static final long STALE_AFTER_DAYS = 30;
 
     private final ArchFlagsPlugin plugin;
     private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
@@ -40,6 +52,8 @@ public final class GeoIpService {
 
     private volatile Reader reader;
     private volatile boolean loadAttempted = false;
+    private volatile String databaseType;
+    private volatile Instant buildTime;
 
     public GeoIpService(ArchFlagsPlugin plugin) {
         this.plugin = plugin;
@@ -50,6 +64,8 @@ public final class GeoIpService {
         executor.submit(() -> {
             loadAttempted = true;
             closeReaderQuietly();
+            databaseType = null;
+            buildTime = null;
 
             File dbFile = new File(plugin.getDataFolder(), plugin.archConfig().geoipDatabaseFile());
             if (!dbFile.exists()) {
@@ -59,9 +75,23 @@ public final class GeoIpService {
                 return;
             }
             try {
-                reader = new Reader(dbFile);
-                plugin.getLogger().info("Loaded GeoIP database (" + dbFile.getName() + ").");
-            } catch (IOException ex) {
+                Reader opened = new Reader(dbFile);
+                databaseType = opened.getMetadata().databaseType();
+                buildTime = opened.getMetadata().buildTime();
+                reader = opened;
+                plugin.getLogger().info("Loaded GeoIP database " + dbFile.getName() + " (type " + databaseType
+                        + ", built " + buildTime.atZone(ZoneOffset.UTC).toLocalDate() + ").");
+                if (!hasCountryData(databaseType)) {
+                    plugin.getLogger().warning("GeoIP database type " + databaseType + " has no country data -- "
+                            + "use GeoLite2-Country (or City). Every player will resolve to Unknown.");
+                }
+                long age = ageInDays(buildTime, Instant.now());
+                if (age > STALE_AFTER_DAYS) {
+                    plugin.getLogger().warning("GeoIP database is " + age + " days old. MaxMind's GeoLite2 license "
+                            + "requires using the current release -- download a fresh copy and run /archflags reload.");
+                }
+                scheduleReresolveOnline();
+            } catch (IOException | RuntimeException ex) {
                 plugin.getLogger().warning("Failed to open GeoIP database: " + ex.getMessage());
                 reader = null;
             }
@@ -74,6 +104,16 @@ public final class GeoIpService {
 
     public boolean hasAttemptedLoad() {
         return loadAttempted;
+    }
+
+    /** MaxMind database type, e.g. "GeoLite2-Country"; null while no database is loaded. */
+    public String databaseType() {
+        return databaseType;
+    }
+
+    /** Build time of the loaded database; null while no database is loaded. */
+    public Instant buildTime() {
+        return buildTime;
     }
 
     /** Non-blocking read of whatever is currently cached; CountryInfo.UNKNOWN if nothing yet. */
@@ -89,7 +129,7 @@ public final class GeoIpService {
         cancelPendingEviction(uuid);
 
         CountryInfo cached = cache.get(uuid);
-        if (cached != null) {
+        if (isReusable(cached)) {
             return CompletableFuture.completedFuture(cached);
         }
 
@@ -97,6 +137,10 @@ public final class GeoIpService {
         executor.submit(() -> {
             CountryInfo result = lookup(address);
             cache.put(uuid, result);
+            if (!plugin.isEnabled()) {
+                future.complete(result);
+                return;
+            }
             Bukkit.getScheduler().runTask(plugin, () -> {
                 Bukkit.getPluginManager().callEvent(new ArchCountryResolvedEvent(uuid, result));
                 plugin.tabIntegration().refresh(uuid);
@@ -106,12 +150,55 @@ public final class GeoIpService {
         return future;
     }
 
+    /** Only a real resolution is worth keeping; Unknown is always retried. */
+    static boolean isReusable(CountryInfo cached) {
+        return cached != null && cached.isResolved();
+    }
+
+    static boolean hasCountryData(String databaseType) {
+        if (databaseType == null) {
+            return false;
+        }
+        String type = databaseType.toLowerCase(Locale.ROOT);
+        return type.contains("country") || type.contains("city") || type.contains("enterprise");
+    }
+
+    static long ageInDays(Instant built, Instant now) {
+        if (built == null || now == null || built.isAfter(now)) {
+            return 0;
+        }
+        return Duration.between(built, now).toDays();
+    }
+
+    static boolean isNonPublic(InetAddress address) {
+        return address.isLoopbackAddress() || address.isSiteLocalAddress()
+                || address.isLinkLocalAddress() || address.isAnyLocalAddress();
+    }
+
+    /**
+     * After a database (re)load, retries every online player still showing Unknown. Addresses
+     * are read on the main thread; the lookups themselves run on the GeoIP executor as usual.
+     */
+    private void scheduleReresolveOnline() {
+        if (!plugin.isEnabled()) {
+            return;
+        }
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                UUID uuid = player.getUniqueId();
+                if (getCountry(uuid).isResolved() || player.getAddress() == null) {
+                    continue;
+                }
+                resolve(uuid, player.getAddress().getAddress());
+            }
+        });
+    }
+
     private CountryInfo lookup(InetAddress address) {
         if (address == null) {
             return CountryInfo.UNKNOWN;
         }
-        if (address.isLoopbackAddress() || address.isSiteLocalAddress()
-                || address.isLinkLocalAddress() || address.isAnyLocalAddress()) {
+        if (isNonPublic(address)) {
             // Private/local addresses (LAN test servers, loopback proxies, etc.) are never sent
             // to MaxMind lookups -- there's nothing meaningful to resolve, and we should not risk
             // treating them as a real public geolocation.
@@ -124,6 +211,7 @@ public final class GeoIpService {
         }
 
         try {
+            @SuppressWarnings("unchecked")
             Map<String, Object> result = r.get(address, Map.class);
             if (result == null) {
                 return CountryInfo.UNKNOWN;

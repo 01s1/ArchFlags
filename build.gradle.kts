@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "gg.arch"
-version = "1.2.1"
+version = "1.2.2-rc1"
 
 // Optional local-only escape hatch: this repo's standard location is under a OneDrive-synced,
 // non-ASCII-named directory, and OneDrive's real-time file scanning holds transient locks on
@@ -64,7 +64,9 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testRuntimeOnly("org.junit.platform:junit-platform-console:1.11.0")
 
-    testCompileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    // Runtime too (not just compile): the config-migration and renderer tests use Bukkit's
+    // YamlConfiguration, which needs no running server.
+    testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
 }
 
 tasks.withType<JavaCompile> {

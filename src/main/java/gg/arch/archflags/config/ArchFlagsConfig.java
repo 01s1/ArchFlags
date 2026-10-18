@@ -1,7 +1,13 @@
 package gg.arch.archflags.config;
 
 import gg.arch.archflags.ArchFlagsPlugin;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 /**
@@ -45,9 +51,13 @@ public final class ArchFlagsConfig {
     private final boolean bedrockPrefixFallbackEnabled;
     private final String bedrockPrefixFallbackPrefix;
 
-    private final java.util.Map<String, String> messages = new java.util.HashMap<>();
+    private final Map<String, String> messages;
 
     public ArchFlagsConfig(ArchFlagsPlugin plugin, FileConfiguration cfg) {
+        this(plugin.getLogger(), cfg);
+    }
+
+    public ArchFlagsConfig(Logger logger, FileConfiguration cfg) {
         this.debug = cfg.getBoolean("debug", false);
 
         this.geoipDatabaseFile = cfg.getString("geoip.database-file", "GeoLite2-Country.mmdb");
@@ -56,7 +66,7 @@ public final class ArchFlagsConfig {
         this.fallbackMode = DisplayMode.parse(cfg.getString("display.fallback-mode"), DisplayMode.COUNTRY_CODE);
         this.unknownCode = cfg.getString("display.unknown-code", "UN");
         this.unknownCountry = cfg.getString("display.unknown-country", "Unknown");
-        this.unknownFlag = cfg.getString("display.unknown-flag", "");
+        this.unknownFlag = cfg.getString("display.unknown-flag", "[UN]");
         this.addSpaceBeforeFlag = cfg.getBoolean("display.add-space-before-flag", true);
 
         this.nametagSeparator = cfg.getString("nametag.separator", " | ");
@@ -66,7 +76,7 @@ public final class ArchFlagsConfig {
         try {
             parsedStart = Integer.parseInt(startHex.trim(), 16);
         } catch (NumberFormatException ex) {
-            plugin.getLogger().warning("glyphs.start-codepoint '" + startHex + "' is not valid hex; defaulting to E200.");
+            logger.warning("glyphs.start-codepoint '" + startHex + "' is not valid hex; defaulting to E200.");
             parsedStart = 0xE200;
         }
         this.glyphStartCodepoint = parsedStart;
@@ -92,11 +102,30 @@ public final class ArchFlagsConfig {
         this.bedrockPrefixFallbackEnabled = cfg.getBoolean("bedrock-detection.username-prefix-fallback.enabled", false);
         this.bedrockPrefixFallbackPrefix = cfg.getString("bedrock-detection.username-prefix-fallback.prefix", ".");
 
-        if (cfg.isConfigurationSection("messages")) {
-            for (String key : cfg.getConfigurationSection("messages").getKeys(false)) {
-                messages.put(key, ChatColor.translateAlternateColorCodes('&', cfg.getString("messages." + key, "")));
-            }
+        Configuration defaults = cfg.getDefaults();
+        this.messages = loadMessages(cfg.getConfigurationSection("messages"),
+                defaults != null ? defaults.getConfigurationSection("messages") : null);
+    }
+
+    /**
+     * Every message key from the file, plus any bundled default the file lacks -- so a config
+     * written by an older version never shows a raw key such as "flag-status-on" to players.
+     */
+    static Map<String, String> loadMessages(ConfigurationSection fromFile, ConfigurationSection fromDefaults) {
+        Set<String> keys = new LinkedHashSet<>();
+        if (fromDefaults != null) {
+            keys.addAll(fromDefaults.getKeys(false));
         }
+        if (fromFile != null) {
+            keys.addAll(fromFile.getKeys(false));
+        }
+        Map<String, String> result = new java.util.HashMap<>();
+        for (String key : keys) {
+            String raw = fromFile != null && fromFile.isString(key) ? fromFile.getString(key)
+                    : fromDefaults != null ? fromDefaults.getString(key, "") : "";
+            result.put(key, ChatColor.translateAlternateColorCodes('&', raw));
+        }
+        return Map.copyOf(result);
     }
 
     public boolean debug() {
