@@ -4,6 +4,8 @@ import gg.arch.archflags.ArchFlagsPlugin;
 import gg.arch.archflags.api.CountryInfo;
 import gg.arch.archflags.resourcepack.JavaResourcePackService;
 import gg.arch.archflags.util.FlagRenderer;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -81,8 +83,10 @@ public final class ArchFlagsAdminCommand implements CommandExecutor, TabComplete
             sender.sendMessage("Usage: /archflags lookup <player>");
             return;
         }
-        OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
-        if (target.getUniqueId() == null || (!target.hasPlayedBefore() && !target.isOnline())) {
+        // Cached-only: Bukkit.getOfflinePlayer(String) can block the main thread on a Mojang
+        // profile lookup for a name that never joined.
+        OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
+        if (target == null || (!target.hasPlayedBefore() && !target.isOnline())) {
             sender.sendMessage(plugin.archConfig().prefixedMessage("player-not-found"));
             return;
         }
@@ -108,7 +112,9 @@ public final class ArchFlagsAdminCommand implements CommandExecutor, TabComplete
         var cfg = plugin.archConfig();
         var pack = plugin.resourcePackService();
         sender.sendMessage(cfg.prefixedMessage("status-header"));
-        sender.sendMessage("GeoIP database loaded: " + plugin.geoIpService().isAvailable());
+        var geo = plugin.geoIpService();
+        sender.sendMessage("GeoIP database loaded: " + geo.isAvailable()
+                + (geo.isAvailable() ? " (" + geo.databaseType() + ", built " + describeBuild(geo.buildTime()) + ")" : ""));
         sender.sendMessage("Glyph mapping loaded: " + plugin.glyphMapping().isLoaded() + " (" + plugin.glyphMapping().size() + " countries)");
         sender.sendMessage("Display mode: " + cfg.displayMode() + " (fallback " + cfg.fallbackMode() + ")");
         sender.sendMessage("LuckPerms hook: " + (plugin.visibilityStore().isLuckPermsAvailable() ? "available" : "unavailable"));
@@ -120,7 +126,19 @@ public final class ArchFlagsAdminCommand implements CommandExecutor, TabComplete
         sender.sendMessage("Pack URL: " + (pack.packUri() != null ? pack.packUri() : "(none)"));
         sender.sendMessage("Pack SHA1: " + (pack.sha1() != null ? pack.sha1() : "(none)"));
         sender.sendMessage("Self-host port: " + pack.selfHostPort());
+        if (pack.isEnabled() && pack.nxRanksSendsPack()) {
+            sender.sendMessage("WARNING: NxRanks also sends a Java pack and removes this one on join -- "
+                    + "merge the archflags font into it and disable resourcepack.java (see console/README).");
+        }
         sender.sendMessage("Debug: " + cfg.debug());
+    }
+
+    private static String describeBuild(Instant built) {
+        if (built == null) {
+            return "unknown";
+        }
+        long days = java.time.Duration.between(built, Instant.now()).toDays();
+        return built.atZone(ZoneOffset.UTC).toLocalDate() + ", " + Math.max(0, days) + " days ago";
     }
 
     private String describeDeliveryMode(JavaResourcePackService pack) {

@@ -74,11 +74,31 @@ public final class FlagsCommand implements CommandExecutor, TabCompleter {
     }
 
     private void apply(Player player, UUID uuid, boolean newValue, boolean previous) {
-        plugin.visibilityStore().setVisible(uuid, newValue).thenRun(() ->
-                Bukkit.getScheduler().runTask(plugin, () -> {
-                    Bukkit.getPluginManager().callEvent(new ArchFlagVisibilityChangeEvent(uuid, newValue, previous));
+        String successKey = newValue ? "flag-enabled" : "flag-disabled";
+        if (newValue == previous) {
+            // Already in the requested state: nothing to write, no change event.
+            player.sendMessage(plugin.archConfig().prefixedMessage(successKey));
+            return;
+        }
+        plugin.visibilityStore().setVisible(uuid, newValue).whenComplete((ignored, error) -> {
+            if (!plugin.isEnabled()) {
+                return;
+            }
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (error != null) {
+                    plugin.getLogger().warning("Failed to save flag visibility for " + player.getName() + ": " + error);
+                }
+                // A failed save may still have changed the in-memory value, so report what is
+                // actually in effect on this server now.
+                boolean effective = plugin.visibilityStore().isVisible(uuid);
+                if (effective != previous) {
+                    Bukkit.getPluginManager().callEvent(new ArchFlagVisibilityChangeEvent(uuid, effective, previous));
                     plugin.tabIntegration().refresh(uuid);
-                    player.sendMessage(plugin.archConfig().prefixedMessage(newValue ? "flag-enabled" : "flag-disabled"));
-                }));
+                }
+                if (player.isOnline()) {
+                    player.sendMessage(plugin.archConfig().prefixedMessage(error == null ? successKey : "flag-save-failed"));
+                }
+            });
+        });
     }
 }

@@ -11,8 +11,9 @@ you wire into TAB's own nametag config.
 
 ArchFlags' glyphs stay in their own codepoint range (`E200`-`E2F9`, never `E9xx`, which is
 NxRanks') on both platforms, but the two platforms deliver that glyph differently:
-**Java** gets ArchFlags' own independent resource pack, sent additively alongside NxRanks'
-(never merged, never replaces it). **Bedrock** is the opposite: ArchFlags does **not** ship or
+**Java** uses ArchFlags' own `archflags:flags` font, either merged into the NxRanks Java pack
+(recommended whenever NxRanks sends a pack) or sent by ArchFlags as a separate, additive pack --
+see "Java pack" below. **Bedrock** never gets a second pack: ArchFlags does **not** ship or
 activate a separate Bedrock pack at all -- Geyser on this network only reliably renders custom
 glyphs from a single active pack, so ArchFlags' Bedrock glyph sheet is instead *merged into* the
 network's one existing, known-good Bedrock pack (see "Bedrock pack" below). It's designed to be
@@ -50,15 +51,20 @@ ArchFlags does **not** create or require its own MySQL/MariaDB database.
    <https://www.maxmind.com/en/geolite2/signup>) and place it at
    `plugins/ArchFlags/GeoLite2-Country.mmdb`. Without it, ArchFlags stays up and every
    placeholder falls back to the configured "unknown" values -- it does not error or disable
-   itself.
+   itself. On load it logs the database type and build date, warns when the type has no
+   country data (for example an ASN database) or the file is more than 30 days old (MaxMind's
+   GeoLite2 license requires using the current weekly release), and re-resolves every online
+   player still showing Unknown -- so replacing the file and running `/archflags reload` takes
+   effect without anyone relogging.
 4. Start the server once to generate `plugins/ArchFlags/config.yml` and
-   `glyph-mapping.yml`, then review `config.yml` (see below) if you're using `CUSTOM_GLYPH`
-   mode -- in particular `resourcepack.java.url`. **Recommended:** host
-   `output/ArchFlags-Java.zip` on your own web server/CDN and put that one URL in
-   `resourcepack.java.url` on all three backends, so you're not running a self-hosted HTTP
+   `glyph-mapping.yml`, then decide how Java players get the flag font if you're using
+   `CUSTOM_GLYPH` mode -- see "Java pack" below. **If NxRanks sends a Java pack on your
+   network, merge the font into that pack and set `resourcepack.java.enabled: false`.**
+   Otherwise, host `output/ArchFlags-Java.zip` on your own web server/CDN and put that one URL
+   in `resourcepack.java.url` on all three backends, so you're not running a self-hosted HTTP
    server (and opening a port) on every server. Self-hosting is on by default as a fallback for
    quick testing, but needs `resourcepack.java.self-host.public-address` set (and its own port
-   per backend if they share a machine) -- see "Resource packs" below.
+   per backend if they share a machine).
 5. If you want the Bedrock flag glyphs too, run `merge-bedrock.mjs` to inject them into your
    existing, known-good Bedrock pack, then replace that ONE pack in
    `Velocity/plugins/Geyser-Velocity/packs/` on the proxy -- see "Bedrock pack" below. This step
@@ -71,6 +77,25 @@ ArchFlags does **not** create or require its own MySQL/MariaDB database.
    reliably tell Java and Bedrock players apart, and Bedrock players may end up receiving the
    Java pack, which they can't use.
 8. Repeat steps 2-7 identically on HUB, SMP, and SURVIVAL.
+
+## Upgrading (config migration)
+
+Bukkit never adds new default keys to a `config.yml` that already exists, so configs written by
+ArchFlags 1.0.0-1.2.1 lack newer keys (for example `messages.flag-status-on`, the
+`resourcepack` and `bedrock-detection` sections). From 1.2.2, on every start and
+`/archflags reload`:
+
+- If `config-version` is missing or below the bundled value (2), ArchFlags first copies the file
+  to `config.yml.v<old>-<yyyyMMdd-HHmmss>.bak` (never overwriting an existing backup), then adds
+  every missing key with its bundled comment and sets `config-version`. Existing values are
+  never changed or removed, including keys newer versions no longer use. The file is re-saved
+  by Bukkit, so quoting and spacing may change; values do not. The console lists every added key.
+- Any message key still missing (for example if the migration could not write the file) falls
+  back to the bundled text instead of showing the raw key to players.
+
+Rollback: stop the server, put back the old JAR, and restore the `.bak` file as `config.yml`
+(older versions also ignore the added keys, so this step is optional). The TEST checklist for
+this release is in [`docs/TEST-PLAN.md`](docs/TEST-PLAN.md).
 
 ## Placeholders
 
@@ -86,22 +111,23 @@ ArchFlags does **not** create or require its own MySQL/MariaDB database.
 
 ## TAB integration
 
-ArchFlags does not touch TAB. In TAB's `config.yml`, add the suffix placeholder to the
-**above-head nametag** value only -- never to `tablist-name-formatting` or any chat format:
+ArchFlags does not touch TAB. Add the suffix placeholder to the **above-head nametag** suffix
+only -- never to `tabprefix`/`tabsuffix` (the player list) or any chat format. TAB sets the
+nametag per group in `groups.yml` with `tagprefix`/`tagsuffix` (TAB `config-version: 6`
+layout); append the placeholder to the end of the existing suffix and leave the rank prefix
+alone:
 
 ```yaml
-# TAB config.yml (illustrative -- keep your existing NxRanks/LuckPerms prefix on the left)
-per-world:
-  # ...
-  above-head:
-    tag-format: "%luckperms_prefix%%player%%archflags_nametag_suffix%"
+# TAB groups.yml
+_DEFAULT_:
+  tagprefix: "%luckperms-prefix%"
+  tagsuffix: "%luckperms-suffix%%archflags_nametag_suffix%"
 ```
 
-The exact key name depends on your TAB version/config layout (`nametag_format`,
-`tagprefix`/`tagsuffix`, or the above-head section under `nametags` in newer TAB releases) --
-the important part is: put `%archflags_nametag_suffix%` at the very end of the **nametag**
-value only, after the existing rank prefix and player name, and do not add any ArchFlags
-placeholder to TAB's player-list format.
+Any group, `per-world` group, or user (`users.yml`) that sets its own `tagsuffix` overrides
+`_DEFAULT_`, so add the placeholder there too. For `CUSTOM_GLYPH` mode, TAB must parse MiniMessage
+(`components.minimessage-support: true` in TAB's `config.yml`) so the `<font:...>` wrap below
+reaches Java clients. Bedrock viewers get the same codepoint from the merged Bedrock glyph sheet.
 
 ### Immediate refresh (no relog)
 
@@ -125,14 +151,44 @@ TAB version doesn't support MiniMessage in the above-head nametag, set
 `glyphs.wrap-minimessage: false` and switch `display.mode` to `UNICODE` or `COUNTRY_CODE`
 instead, which need no custom font at all.
 
-## Java resource pack (independent of NxRanks -- never merged)
+## Java pack
 
 `output/ArchFlags-Java.zip`, generated by `tools/asset-generator/generate.mjs`, is embedded
-directly in the plugin jar. ArchFlags sends it
-to every Java player itself, right on join, using Minecraft's multi-resource-pack protocol
-(1.20.3+) with `replace: false` -- i.e. **added alongside** whatever pack(s) NxRanks already
-sends, never replacing them, and an NxRanks pack update likewise never removes ArchFlags' pack
-(they're two separate pack IDs). Bedrock players are skipped -- see "Bedrock detection" below for
+directly in the plugin jar, and every start (or `/archflags reload`) stages a copy at
+`plugins/ArchFlags/ArchFlags-Java.zip` and logs its SHA-1 -- even with sending disabled. It
+contains only ArchFlags' own namespace: `assets/archflags/font/flags.json` (the
+`archflags:flags` font) and `assets/archflags/textures/font/flags/*.png`. It never touches
+`assets/minecraft/`, so it cannot collide with NxRanks' rank glyphs in `minecraft:default`.
+
+Pick **one** of two delivery modes per network.
+
+### Merged into the NxRanks pack (recommended when NxRanks sends a pack)
+
+NxRanks 1.2 sends its pack one tick after join with Paper's legacy single-pack call
+(`Player#setResourcePack(String, byte[], String, boolean)`), which first removes every pack the
+server already sent -- including a separate ArchFlags pack. Its pack-status handler also does not
+check which pack a status belongs to, so with its default `kick-on-deny: true` /
+`kick-on-fail: true`, a player who declines or fails to download the *ArchFlags* pack is kicked.
+When both senders are enabled, ArchFlags warns on startup and in `/archflags status`.
+
+1. Back up the exact Java pack NxRanks currently serves (its `resource-pack.url`). Don't start
+   from an older copy.
+2. Copy the `assets/archflags/` folder from `plugins/ArchFlags/ArchFlags-Java.zip` into that
+   pack, next to its existing `assets/minecraft/`. Change nothing else -- in particular not
+   `assets/minecraft/font/default.json` or `pack.mcmeta`.
+3. Zip it with `pack.mcmeta` at the root, upload it in place of the old file, and restart (or
+   let NxRanks pick up the new URL).
+4. Set `resourcepack.java.enabled: false` on every backend. `/archflags status` then shows the
+   Java pack as disabled; the staged file and its SHA-1 are still logged for the next merge.
+5. After an ArchFlags update, compare the staged SHA-1 in the log with the one you merged, and
+   re-merge only when it changed.
+
+### Sent separately by ArchFlags
+
+Only safe when no other plugin sends a pack with the legacy single-pack call. ArchFlags sends its
+pack to every Java player itself, right on join, using Minecraft's multi-resource-pack protocol
+(1.20.3+) with `replace: false` -- i.e. **added alongside** other packs sent the same way, under
+its own pack ID. Bedrock players are skipped -- see "Bedrock detection" below for
 how that's actually determined on this network. Nothing to install by hand for Java players
 beyond making the pack reachable -- see `resourcepack.java` in `config.yml`:
 - **Externally hosted (recommended):** host `output/ArchFlags-Java.zip` on your own web
@@ -255,7 +311,7 @@ display:
   fallback-mode: COUNTRY_CODE
 ```
 
-- `CUSTOM_GLYPH` -- the generated resource-pack glyphs (needs the independent packs above).
+- `CUSTOM_GLYPH` -- the generated resource-pack glyphs (needs the Java and Bedrock packs above).
 - `UNICODE` -- standard regional-indicator flag emoji (🇸🇦). No resource pack needed, but
   rendering depends entirely on the client's own font/emoji support.
 - `COUNTRY_CODE` -- plain text like `[SA]`. Always works, needs nothing.
@@ -284,7 +340,8 @@ names. Any unrecognized `/flag` argument (e.g. `/flag banana`) is rejected with 
 message -- it does **not** silently fall back to showing status.
 
 `/archflags lookup` never prints a raw IP address -- only the resolved country name/code and
-visibility. Offline players who haven't connected recently show as "Unknown" (nothing is
+visibility. It only finds players this server knows (online, or joined before) and never
+blocks the main thread on a Mojang profile lookup for an unknown name. Offline players who haven't connected recently show as "Unknown" (nothing is
 resolvable without a live connection, and ArchFlags never stores a raw IP to look up later).
 
 `/archflags status` reports every integration's actual state at a glance -- GeoIP/mapping
@@ -304,6 +361,11 @@ caches the placeholder value itself, so TAB re-evaluates it as soon as ArchFlags
 immediate refresh (or, worst case, on TAB's own next normal refresh tick). If LuckPerms isn't
 installed, ArchFlags still works, but the choice only persists in memory for that single
 server's session (a startup warning is logged).
+
+`/flag` waits for LuckPerms to confirm the save before it reports success. If the save fails,
+the player gets `messages.flag-save-failed`, the error is logged, and the visibility change event
+only fires if the value in effect on this server really changed. Asking for the state a player
+is already in (`/flag on` while on) writes nothing and fires no event.
 
 ## Java/Bedrock parity
 
@@ -344,7 +406,10 @@ main-thread) for any plugin to listen to instead of polling.
   dedicated single-thread executor. `ArchFlagsService.getCountry(uuid)` only ever reads an
   in-memory cache, so it's always safe to call from the main thread.
 - Resolved countries are cached per-player in memory and evicted a configurable number of
-  minutes after quit (`cache.retain-after-quit-minutes`).
+  minutes after quit (`cache.retain-after-quit-minutes`). Only real resolutions are reused; an
+  Unknown result is retried on the next join and whenever a database loads.
+- TAB resolves placeholders on its own thread, so a glyph-mapping reload builds the new map
+  separately and swaps it in with one write; readers never see a half-loaded mapping.
 
 ## Building from source
 

@@ -4,6 +4,11 @@
 # player's above-head nametag. It never edits TAB, chat, the player
 # list, scoreboards, bossbars or titles by itself. See README.md.
 
+# Managed by ArchFlags: on startup, an older config.yml is backed up and
+# any keys it lacks are added from this file. Existing values are never
+# changed. Do not edit.
+config-version: 2
+
 debug: false
 
 geoip:
@@ -35,9 +40,11 @@ nametag:
 #
 # IMPORTANT: E200-E2F9 is ArchFlags' own, separate private-use-area range.
 # NxRanks uses E9xx for its own glyphs on this network -- never change
-# start-codepoint to something inside E900-E9FF. The Java pack stays fully
-# independent (see resourcepack.java below); the Bedrock glyph sheet is
-# merged into the network's single existing Bedrock pack instead (see
+# start-codepoint to something inside E900-E9FF. On Java the flags live in
+# their own archflags:flags font, so they never collide with NxRanks'
+# minecraft:default glyphs, sent separately or merged (see resourcepack.java
+# below); the Bedrock glyph sheet is merged into the network's single
+# existing Bedrock pack (see
 # tools/asset-generator/merge-bedrock.mjs and README.md "Bedrock pack") --
 # it only ever touches its own E2xx sheet file, never NxRanks' E9xx one. If
 # you change this, re-run tools/asset-generator and update nothing else here
@@ -48,16 +55,21 @@ glyphs:
   wrap-minimessage: true
   font-key: "archflags:flags"
 
-# ArchFlags' own, fully independent Java resource pack (never merged into NxRanks'). Sent
-# additively alongside whatever pack(s) NxRanks already sends -- it is never replaced by an
-# NxRanks update, and updating NxRanks never removes it. Only used in CUSTOM_GLYPH mode; leave
-# resourcepack.java.enabled: false if you only use UNICODE/COUNTRY_CODE modes.
+# ArchFlags' own Java resource pack (the archflags:flags font). Only used in CUSTOM_GLYPH mode.
 #
-# Bedrock works differently ON PURPOSE: this plugin does NOT send or ship a separate Bedrock
-# pack (an earlier version did, and it broke custom glyph rendering for both packs in practice).
-# Instead, ArchFlags' Bedrock glyph sheet is merged into the network's existing, known-good
-# Bedrock pack (tools/asset-generator/merge-bedrock.mjs) so Geyser only ever loads ONE Bedrock
-# pack. See README.md "Bedrock pack".
+# Two ways to deliver it -- pick ONE per network:
+#  1. MERGED (recommended when NxRanks also sends a Java pack): merge the archflags font into
+#     the NxRanks Java pack, serve that single pack through NxRanks, and set enabled: false here.
+#     NxRanks 1.2 sends its pack with Paper's legacy single-pack call, which removes every other
+#     server pack (including this one) one tick after join, and it kicks players for ANY
+#     declined/failed pack. ArchFlags still stages plugins/ArchFlags/ArchFlags-Java.zip with
+#     sending disabled, so you can merge it -- see README.md "Java pack".
+#  2. SEPARATE: enabled: true, and ArchFlags sends its pack additively (multi-pack protocol,
+#     1.20.3+) next to any other pack. Only safe when no other plugin uses the legacy call.
+#
+# Bedrock never uses this: ArchFlags' Bedrock glyph sheet is merged into the network's single
+# existing Bedrock pack (tools/asset-generator/merge-bedrock.mjs), so Geyser only ever loads
+# ONE Bedrock pack. See README.md "Bedrock pack".
 resourcepack:
   java:
     enabled: true
@@ -82,7 +94,8 @@ resourcepack:
       public-address: ""
 
 # Bedrock-player detection, used only to decide whether to send the Java resource pack above
-# (Bedrock clients never need it -- they get ArchFlags-Bedrock.zip via Geyser instead).
+# (Bedrock clients never need it -- they get the flag glyphs from the network's single merged
+# Bedrock pack via Geyser instead).
 #
 # IMPORTANT for this network: Geyser + Floodgate run on the VELOCITY PROXY, not on this backend.
 # That means Floodgate's own reliable detection API is only reachable here if the Floodgate
@@ -119,6 +132,7 @@ messages:
   flag-status-on: "&fCountry flag: &aON"
   flag-status-off: "&fCountry flag: &cOFF"
   flag-usage: "&cUsage: /flag <on|off|toggle|status>"
+  flag-save-failed: "&cYour flag setting could not be saved network-wide. Please try again later."
   no-permission: "&cYou do not have permission to use this command."
   player-only: "&cThis command can only be used by a player."
   player-not-found: "&cPlayer not found or never joined."

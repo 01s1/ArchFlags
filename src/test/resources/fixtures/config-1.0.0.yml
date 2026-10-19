@@ -1,0 +1,67 @@
+# ArchFlags configuration
+# ------------------------------------------------------------------
+# ArchFlags ONLY provides data + PlaceholderAPI placeholders for the
+# player's above-head nametag. It never edits TAB, chat, the player
+# list, scoreboards, bossbars or titles by itself. See README.md.
+
+debug: false
+
+geoip:
+  # Relative to the plugin's data folder: plugins/ArchFlags/GeoLite2-Country.mmdb
+  database-file: "GeoLite2-Country.mmdb"
+
+display:
+  # CUSTOM_GLYPH, UNICODE, or COUNTRY_CODE
+  mode: CUSTOM_GLYPH
+  # Used automatically if CUSTOM_GLYPH assets/mapping are unavailable, so players
+  # never see broken-square tofu glyphs.
+  fallback-mode: COUNTRY_CODE
+  unknown-code: "UN"
+  unknown-country: "Unknown"
+  # What %archflags_flag% resolves to when the country can't be resolved.
+  # Leave blank to hide unknown countries entirely instead of showing [UN].
+  unknown-flag: "[UN]"
+  add-space-before-flag: true
+
+nametag:
+  # Used to build %archflags_nametag_suffix%. Only applied when a flag is
+  # actually shown (visible + resolvable) -- otherwise the suffix is "".
+  separator: " | "
+
+# Wraps the glyph placeholder output in a MiniMessage <font:...> tag, so TAB
+# (or any MiniMessage-aware renderer) picks the right custom font for the
+# glyph automatically. Only used in CUSTOM_GLYPH mode. See README.md ->
+# "TAB integration" for how to reference this in TAB's nametag config.
+glyphs:
+  start-codepoint: "E200"
+  mapping-file: "glyph-mapping.yml"
+  wrap-minimessage: true
+  font-key: "archflags:flags"
+
+luckperms:
+  # LuckPerms meta node used to persist flag visibility network-wide.
+  # No separate database is created -- this rides on LuckPerms' existing
+  # MySQL storage that's already shared across Hub/Survival/SMP.
+  preference-node: "archflags.visible"
+
+cache:
+  enabled: true
+  # How long a resolved country stays cached in memory after the player
+  # disconnects, in minutes, before it's evicted.
+  retain-after-quit-minutes: 30
+
+messages:
+  prefix: "&8[&bArchFlags&8] &r"
+  flag-enabled: "&aFlag visibility enabled."
+  flag-disabled: "&cFlag visibility disabled."
+  flag-status: "&7Your flag is currently &f%state%&7."
+  no-permission: "&cYou don't have permission to do that."
+  player-only: "&cThis command can only be used by a player."
+  player-not-found: "&cPlayer not found or never joined."
+  reload-success: "&aArchFlags configuration reloaded."
+  admin-lookup-header: "&7--- &bArchFlags Lookup &7---"
+  admin-lookup-player: "&7Player: &f%player%"
+  admin-lookup-country: "&7Country: &f%country%"
+  admin-lookup-code: "&7Code: &f%code%"
+  admin-lookup-visible: "&7Visible: &f%visible%"
+  status-header: "&7--- &bArchFlags Status &7---"

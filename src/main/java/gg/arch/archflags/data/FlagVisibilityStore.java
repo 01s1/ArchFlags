@@ -99,17 +99,16 @@ public final class FlagVisibilityStore {
         UserManager userManager = luckPerms.getUserManager();
         User cached = userManager.getUser(uuid);
         if (cached != null) {
-            applyAndSave(userManager, cached, visible);
-            return CompletableFuture.completedFuture(null);
+            return applyAndSave(userManager, cached, visible);
         }
-        return userManager.loadUser(uuid).thenAccept(user -> applyAndSave(userManager, user, visible));
+        return userManager.loadUser(uuid).thenCompose(user -> applyAndSave(userManager, user, visible));
     }
 
-    private void applyAndSave(UserManager userManager, User user, boolean visible) {
+    private CompletableFuture<Void> applyAndSave(UserManager userManager, User user, boolean visible) {
         String key = nodeKey();
         user.data().clear(node -> node.getType() == NodeType.PERMISSION
                 && ((PermissionNode) node).getPermission().equalsIgnoreCase(key));
         user.data().add(PermissionNode.builder(key).value(visible).build());
-        userManager.saveUser(user);
+        return userManager.saveUser(user);
     }
 }
