@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "gg.arch"
-version = "1.2.2-rc1"
+version = "1.2.2-rc2"
 
 // Optional local-only escape hatch: this repo's standard location is under a OneDrive-synced,
 // non-ASCII-named directory, and OneDrive's real-time file scanning holds transient locks on

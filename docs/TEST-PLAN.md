@@ -46,6 +46,7 @@ resourcepack:
 | 12 | Lookup | `/archflags lookup <online player>`, then a name that never joined. | Country shown for the first; instant "Player not found" for the second (no lag spike). |
 | 13 | ArchSettings | Toggle the flag setting in the ArchSettings menu. | Same effect as `/flag`. |
 | 14 | Conflict warning | Temporarily set `resourcepack.java.enabled: true` (with a valid URL) and restart. | One tick after start: warning that NxRanks removes the separate pack; the same warning in `/archflags status`. Set it back to `false`. |
+| 15 | Without LuckPerms (1.2.2-rc2) | On a backend without LuckPerms (or with LuckPerms removed for this check), start the server; `/flag off`, `/flag status`. | ArchFlags enables (no `NoClassDefFoundError`), logs "LuckPerms not found -- flag visibility will default to per-server memory only"; `/flag` works for this session; `/archflags status` answers. |
 
 ## Rollback
 

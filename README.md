@@ -360,7 +360,8 @@ takes effect immediately, with no relog: LuckPerms persists it right away, and A
 caches the placeholder value itself, so TAB re-evaluates it as soon as ArchFlags calls for an
 immediate refresh (or, worst case, on TAB's own next normal refresh tick). If LuckPerms isn't
 installed, ArchFlags still works, but the choice only persists in memory for that single
-server's session (a startup warning is logged).
+server's session (a startup warning is logged). (1.2.2-rc1 failed to enable without LuckPerms; fixed in
+1.2.2-rc2.)
 
 `/flag` waits for LuckPerms to confirm the save before it reports success. If the save fails,
 the player gets `messages.flag-save-failed`, the error is logged, and the visibility change event
