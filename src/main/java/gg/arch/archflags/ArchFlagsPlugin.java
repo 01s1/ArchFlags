@@ -41,7 +41,10 @@ public final class ArchFlagsPlugin extends JavaPlugin {
         saveDefaultConfig();
         migrateConfig();
         reloadConfig();
-        saveResource("glyph-mapping.yml", false);
+        // saveResource(..., false) logs a warning on every start once the file exists.
+        if (!new File(getDataFolder(), "glyph-mapping.yml").exists()) {
+            saveResource("glyph-mapping.yml", false);
+        }
 
         this.config = new ArchFlagsConfig(this, getConfig());
         this.geoIpService = new GeoIpService(this);
